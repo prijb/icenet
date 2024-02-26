@@ -449,7 +449,7 @@ if __name__ == '__main__':
     QCD(outputfile=outputfile, filerange=args.filerange)
   
   elif args.process == 'data':
-    data_scouting(outputfile=outputfile, filerange=args.filerange)
+    data(outputfile=outputfile, filerange=args.filerange)
   
   else:
     print('Error: unknown --process chosen (run --help)')
