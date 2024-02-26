@@ -55,6 +55,38 @@ def deltaR(x, eta1: str, eta2: str, phi1: str, phi2: str):
     
     return np.sqrt(deltaEta**2 + deltaPhi**2)
 
+def deltaEta(x, eta1: str, eta2: str):
+    """
+    dEta distance (invariant [massless limit y --> eta] under longitudinal boosts)
+    
+    With awkward arrays
+    """
+    deltaEta = x[eta1] - x[eta2]
+    
+    return deltaEta
+
+def deltaPhi(x, phi1: str, phi2: str):
+    """
+    dPhi distance (invariant [massless limit y --> eta] under longitudinal boosts)
+    
+    With awkward arrays
+    """
+    deltaPhi = phi_phasewrap(x[phi1] - x[phi2])
+
+    return deltaPhi
+
+def dimuon_pt(x, pt1, pt2, phi1, phi2):
+    """
+    Calculates pT of the dimuon system
+    Uses mu1(2) pt and phi
+    Subtlety: Not sure if the phi is from the muon stations or tracker
+    """
+
+    dimuon_px = x[pt1]*np.cos(x[phi1]) + x[pt2]*np.cos(x[phi2])
+    dimuon_py = x[pt1]*np.sin(x[phi1]) + x[pt2]*np.sin(x[phi2])
+    
+    return np.sqrt(dimuon_px**2 + dimuon_py**2)
+
 
 def fox_wolfram_boost_inv(p, L=10):
     """

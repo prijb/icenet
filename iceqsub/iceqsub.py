@@ -72,7 +72,7 @@ def main():
     parser.add_argument('-c', '--config', default='configs/qsub/config.yml')
     parser.add_argument('-j', '--job',    default='hello_world')
     parser.add_argument('-r', '--run',    action='store_true')  # on/off flag
-    parser.add_argument('-M', '--email',  default='m.mieskolainen@imperial.ac.uk')
+    parser.add_argument('-M', '--email',  default='prijith.babu-pradeep18@imperial.ac.uk')
     
     parser.add_argument('-o', '--output', default='$HOME')  # std output
     parser.add_argument('-e', '--error',  default='$HOME')  # error output

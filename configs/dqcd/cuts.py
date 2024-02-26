@@ -39,3 +39,25 @@ def cut_fiducial(X, xcorr_flow=False):
     mask  = stx.apply_cutflow(cut=cuts, names=names, xcorr_flow=xcorr_flow)
 
     return mask
+
+def cut_fiducial_scouting(X, xcorr_flow=False):
+    """ Basic fiducial (kinematic) selections.
+    
+    Args:
+        X:          Awkward jagged array
+        xcorr_flow: cut N-point cross-correlations
+    
+    Returns:
+        Passing indices mask (N)
+    """
+    global O; O = X  # __technical__ recast due to eval() scope
+    
+    #Scouting specific fiducial cuts (require dimuon instead of single muon pt)
+    names = ['ak.sum(np.logical_and(O.Muon.pt >  3.0, np.abs(O.Muon.eta) < 2.4), -1) > 1']
+                 
+    # Evaluate columnar cuts; Compute cutflow
+    cuts  = [eval(names[i], globals()) for i in range(len(names))]
+    mask  = stx.apply_cutflow(cut=cuts, names=names, xcorr_flow=xcorr_flow)
+
+    return mask
+

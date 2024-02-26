@@ -247,6 +247,18 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
         analytic.deltaR(x=data.x['muonSV'], eta1='mu1eta', eta2='mu2eta', phi1='mu1phi', phi2='mu2phi')
     jagged_vars.append('muonSV_deltaR')
     muonsv_vars.append('muonSV_deltaR')
+
+    ## \DeltaEta
+    data.x['muonSV', 'deltaEta'] = \
+        analytic.deltaEta(x=data.x['muonSV'], eta1='mu1eta', eta2='mu2eta')
+    jagged_vars.append('muonSV_deltaEta')
+    muonsv_vars.append('muonSV_deltaEta')
+
+    ## \DeltaPhi
+    data.x['muonSV', 'deltaPhi'] = \
+        analytic.deltaPhi(x=data.x['muonSV'], phi1='mu1phi', phi2='mu2phi')
+    jagged_vars.append('muonSV_deltaPhi')
+    muonsv_vars.append('muonSV_deltaPhi')
     
     ## Invariant Mass
     data.x['muonSV', 'mass'] = \
@@ -256,6 +268,11 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
     
     jagged_vars.append('muonSV_mass')
     muonsv_vars.append('muonSV_mass')
+
+    ## muonSV pt
+    data.x['muonSV', 'pt'] = analytic.dimuon_pt(x=data.x['muonSV'], pt1="mu1pt", pt2="mu2pt", phi1="mu1phi", phi2="mu2phi")
+    jagged_vars.append('muonSV_pt')
+    muonsv_vars.append('muonSV_pt')
     
     print(data.x['muonSV'].fields)
     

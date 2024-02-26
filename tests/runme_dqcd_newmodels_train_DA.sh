@@ -7,15 +7,15 @@
 source $HOME/setconda.sh
 conda activate icenet
 
-ICEPATH="/vols/cms/mmieskol/icenet"
+ICEPATH="/vols/cms/pb4918/icenet_v3/icenet"
 cd $ICEPATH
 echo "$(pwd)"
 source $ICEPATH/setenv.sh
 
-CONFIG="tune0_new.yml"
-DATAPATH="/vols/cms/khl216"
+CONFIG="tune0_new_scouting.yml"
+DATAPATH="/vols/cms/pb4918"
 
-CONDITIONAL=1
+CONDITIONAL=0
 MAX=2000000    # Tune according to maximum CPU RAM available
 
 python analysis/dqcd.py --runmode genesis  --maxevents $MAX --inputmap mc_map__scenarioA_all_DA.yml --config $CONFIG --datapath $DATAPATH
