@@ -7,7 +7,7 @@
 source $HOME/setconda.sh
 conda activate icenet
 
-ICEPATH="/vols/cms/pb4918/icenet_v3/icenet"
+ICEPATH="/vols/cms/pb4918/icenet_singlebdt/icenet"
 cd $ICEPATH
 echo "$(pwd)"
 source $ICEPATH/setenv.sh

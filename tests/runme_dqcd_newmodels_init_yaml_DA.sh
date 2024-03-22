@@ -10,7 +10,7 @@
 source $HOME/setconda.sh
 conda activate icenet
 
-ICEPATH="/vols/cms/pb4918/icenet_v3/icenet"
+ICEPATH="/vols/cms/pb4918/icenet_singlebdt/icenet"
 cd $ICEPATH
 echo "$(pwd)"
 source $ICEPATH/setenv.sh
@@ -24,4 +24,4 @@ python configs/dqcd/include/ymlgen_scouting.py --process 'data'    --filerange '
 
 # Deployment
 python configs/dqcd/include/ymlgen_scouting.py --process 'QCD'       --filerange '[101-100000]' --outputfile configs/dqcd/include/QCD_newmodels_deploy.yml
-python configs/dqcd/include/ymlgen_scouting.py --process 'scenarioA' --filerange '[21-100000]' --outputfile configs/dqcd/include/scenarioA_deploy.yml
+python configs/dqcd/include/ymlgen_scouting.py --process 'scenarioA' --filerange '[61-100000]' --outputfile configs/dqcd/include/scenarioA_deploy.yml

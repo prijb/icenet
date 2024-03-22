@@ -8,7 +8,7 @@
 source $HOME/setconda.sh
 conda activate icenet
 
-ICEPATH="/vols/cms/pb4918/icenet_v3/icenet"
+ICEPATH="/vols/cms/pb4918/icenet_singlebdt/icenet"
 cd $ICEPATH
 echo "$(pwd)"
 source $ICEPATH/setenv.sh
@@ -17,4 +17,4 @@ CONFIG="tune0_new_scouting.yml"
 DATAPATH="/vols/cms/pb4918"
 CONDITIONAL=0
 
-python analysis/dqcd_deploy.py --runmode deploy --use_conditional $CONDITIONAL --inputmap 'include/QCD_newmodels_deploy.yml' --modeltag scenarioA_all --grid_id $GRID_ID --grid_nodes $GRID_NODES --config $CONFIG --datapath $DATAPATH
+python analysis/dqcd_deploy.py --runmode deploy --use_conditional $CONDITIONAL --inputmap 'include/QCD_newmodels_deploy.yml' --modeltag scenarioA_all_DA --grid_id $GRID_ID --grid_nodes $GRID_NODES --config $CONFIG --datapath $DATAPATH
