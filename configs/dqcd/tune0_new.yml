@@ -4,7 +4,7 @@
 
 rootname: 'dqcd'
 rngseed: 123456                       # Fixed seed for training data mixing
-inputvars: 'mvavars'                  # Main file input description python file
+inputvars: 'mvavars_new'              # Main file input description python file
 
 # ----------------------------------------------------
 mva_param: &MVA_INPUT_PARAM
@@ -110,16 +110,14 @@ train_runmode:
   <<: *MVA_INPUT_PARAM
 
   maxevents: null
+  modeltag:  null
   
-  input_tag: null
-  model_tag: null
-
   # Conditional (theory parametric) dequantization
   conditional_param:
     dequantize_common: True           # Under common.py
     dequantize_batch:  False          # (mini)batch based training (reservation)
     n_interp:   1000                  # Number of interpolation points per dimension
-    kind:       'linear'              # Interpolator ('linear', 'quadratic', 'cubic' ...),
+    kind:       'quadratic'           # Interpolator ('linear', 'quadratic', 'cubic' ...),
                                       # see scipy.interpolate.interp1d
   
   ## Reweighting setup
@@ -153,10 +151,14 @@ train_runmode:
     #- gnet1
     #- gnet3
     
-    - iceboost01-MI
-    - iceboost01-DA-MI
     - iceboost01-DA
+    - iceboost01-DA-NOJETS
+    - iceboost01-DA-MI
+    - iceboost01-DA-MI-NOJETS
     - xgb01
+    
+    #- xgb01-NOJETS
+    #- iceboost01-DA-NC
     
     #- xgb01-no-mass
     #- xgb01-no-jets
@@ -206,15 +208,13 @@ eval_runmode:
   <<: *MVA_INPUT_PARAM
 
   maxevents: null
-
-  input_tag: null
-  model_tag: null
+  modeltag:  null
   
   # Conditional (theory parametric) dequantization
   conditional_param:
-    dequantize_common: True           # Under common.py
+    dequantize_common: False           # Under common.py
     n_interp:   1000                  # Number of interpolation points per dimension
-    kind:       'linear'              # Interpolator ('linear', 'quadratic', 'cubic' ...),
+    kind:       'quadratic'              # Interpolator ('linear', 'quadratic', 'cubic' ...),
                                       # see scipy.interpolate.interp1d
   
   reweight: true
@@ -233,9 +233,7 @@ optimize_runmode:
   <<: *MVA_INPUT_PARAM
 
   maxevents: null
-
-  input_tag: null
-  model_tag: null
+  modeltag:  null
 
   reweight: true
   reweight_mode: 'load'               # 'write', 'load'
@@ -243,6 +241,38 @@ optimize_runmode:
 
   reweight_param: *REWEIGHT_PARAM
 
+  limits_param:
+    luminosity: 41600         # pb^{-1}
+    signal_xs:  44.0          # pb (reference xs), gg -> H https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV
+    target_r:   0.01          # Benchmark branching ratio (BR)
+    
+    const_mode: 'bgk_eff'     # Which to keep constant, 'cut', 'bgk_eff'
+    const_cut:     0.9        # Target cut value (--> FPR varies per signal point)
+    const_bgk_eff: 1.0e-4     # Background efficiency (FPR) target after trigger & pre-cut (--> cut varies per signal point)
+    commutate_BOX: True       # True if commutate BOX cut (with low MC stats), False if apply in physical order
+    
+    model_POI: ['mpi', 'mA', 'ctau'] # Theory (signal) model param-of-interest
+    box_POI:   ['M', 'mA']           # (observable, theory) pair
+    
+    # Be very precise with these and which efficiencies need to book-keeped
+    # (see definitions under plots.yml)
+    GEN_filter_tag: 'F[0]'    # Theory param filter
+    BOX_filter_tag: 'F[4]'    # Mass window filter
+    GBX_filter_tag: 'F[3]'    # Theory param filter & mass window together
+    
+    channel_mode: 'inclusive' # 'inclusive', 'categorical' (not implemented)
+    methods: ['asymptotic']   # ['asymptotic', 'toys']
+    num_toys_obs: 10000       # Number of MC samples for 'toys'
+    systematics: null
+    
+    # ** NOT IMPLEMENTED YET (only in tune0.yml) **
+    brazil: null
+    
+    cosmetics:
+      title:  '$41.6$ fb$^{-1}$, $\sqrt{{s}} = 13$ TeV'
+      ylabel: '$r = \sigma_{gg \rightarrow H \rightarrow DQCD} \, / \sigma_{gg \rightarrow H}$'
+      portal: 'scenario X (new)'
+  
   models:  !include configs/dqcd/models.yml
   active_models: *ACTIVE_MODELS
 
@@ -253,10 +283,8 @@ deploy_runmode:
   <<: *MVA_INPUT_PARAM
 
   maxevents: null
-
-  input_tag: null
-  model_tag: null
-
+  modeltag:  null
+  
   mc_param: !include configs/dqcd/mc_param_new.yml
   
   models:  !include configs/dqcd/models.yml

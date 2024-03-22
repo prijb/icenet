@@ -1,7 +1,6 @@
 # Auxialary functions
 # 
-# Mikael Mieskolainen, 2023
-# m.mieskolainen@imperial.ac.uk
+# m.mieskolainen@imperial.ac.uk, 2024
 
 import math
 import numpy as np
@@ -22,6 +21,8 @@ from sklearn import metrics
 from scipy import stats
 import scipy.special as special
 from scipy import interpolate
+
+from icefit import statstools
 
 
 def weighted_avg_and_std(values, weights):
@@ -51,16 +52,15 @@ def unmask(x, mask, default_value=-1):
     out[mask] = x
     return out
 
-
 def cartesian_product(*arrays):
     """
     N-dimensional generalized cartesian product between arrays
     
     Args:
-        *arrays: a list of arrays
-        
+        *arrays: a list of numpy arrays
+    
     Example:
-        cartesian_product(*[values['m'], values['ctau']])
+        cartesian_product(*[np.array([1,2,3]), np.array([100,200,500])])
     """
     la = len(arrays)
     dtype = np.result_type(*arrays)
@@ -1013,7 +1013,8 @@ class Metric:
         self.fpr        = out['fpr']
         self.tpr        = out['tpr']
         self.thresholds = out['thresholds']
-
+        
+        # Compute bootstrap
         if num_bootstrap > 0 and type(self.tpr) is not int:
             
             self.tpr_bootstrap = (-1)*np.ones((num_bootstrap, len(self.tpr)))
@@ -1024,7 +1025,7 @@ class Metric:
             for i in range(num_bootstrap):
 
                 # ------------------
-                trials = 0
+                trials     = 0
                 max_trials = 10000
                 while True:
                     ind = np.random.choice(range(len(y_true)), size=len(y_true), replace=True)

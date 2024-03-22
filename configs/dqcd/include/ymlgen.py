@@ -24,7 +24,6 @@ def str2float(x):
   else:
     raise Exception(f'str2float: Input {x} should be either str or float')
 
-
 def printer(outputfile, process, path, end_name, filename, xs, force_xs, isMC, maxevents_scale, rp, flush_index=0):
   
   if flush_index == 0:
@@ -38,9 +37,9 @@ def printer(outputfile, process, path, end_name, filename, xs, force_xs, isMC, m
         # MC signal
         if isMC == 'true' and m != 'null':
           param_name   = f'm_{m}_ctau_{ctau}_xiO_{xi_pair[0]}_xiL_{xi_pair[1]}'
-          process_name = f'{process}_{param_name}'  
-          folder_name  = f'{process_name}_{end_name}'
-
+          process_name = f'{process}_{param_name}'
+          folder_name  = f'{process_name}'
+        
         # MC background
         elif isMC == 'true' and m == 'null':
           process_name = f'{process}'  
@@ -150,13 +149,13 @@ def darkphoton(outputfile, filerange='*'):
 
 def vector(outputfile, filerange='*'):
 
-  process         = 'HiddenValley_vector'
+  process         = 'hiddenValleyGridPack_vector'
 
   # ------------------------------------------
   # Basic
-  filename        = f'output_{filerange}.root'
-  path            = 'bparkProductionAll_V1p0'
-  end_name        = 'privateMC_11X_NANOAODSIM_v1p0_generationSync'
+  filename        = f'data_{filerange}.root'
+  path            = 'bparkProductionAll_V1p3'
+  end_name        = ''
   xs              = '1.0 # [pb]'
   force_xs        = 'true'
   isMC            = 'true'
@@ -164,9 +163,9 @@ def vector(outputfile, filerange='*'):
   # ------------------------------------------
   
   rp = {}
-  rp['m']         = ['2', '5', '10', '15', '20']
-  rp['ctau']      = ['1', '10', '50', '100', '500'] 
-  rp['xi_pair']   = [['1', '1']]
+  rp['m']       = ['2', '5', '10', '15', '20']
+  rp['ctau']    = ['1', '10', '50', '100', '500'] 
+  rp['xi_pair'] = [['1', '1']]
   
   param = {
     'outputfile':      outputfile,
@@ -199,9 +198,9 @@ def higgs(outputfile, filerange='*'):
   # ------------------------------------------
   
   rp = {}
-  rp['m']         = ['10', '15', '20']
-  rp['ctau']      = ['10', '50', '100', '500'] 
-  rp['xi_pair']   = [['1', '1'], ['2p5', '1'], ['2p5', '2p5']]
+  rp['m']       = ['10', '15', '20']
+  rp['ctau']    = ['10', '50', '100', '500'] 
+  rp['xi_pair'] = [['1', '1'], ['2p5', '1'], ['2p5', '2p5']]
   
   param = {
     'outputfile':      outputfile,
@@ -216,6 +215,7 @@ def higgs(outputfile, filerange='*'):
     'maxevents_scale': maxevents_scale
   }
   printer(**param)
+
 
 def scenarioA(outputfile, filerange='*'):
 
@@ -352,7 +352,7 @@ def scenarioC(outputfile, filerange='*'):
   printer_newmodels(**param)
 
 
-def QCD(outputfile, filerange='*'):
+def QCD(outputfile, filerange='*', paramera='old'):
 
   processes = [ \
   {'path':     'bparkProductionAll_V1p3',
@@ -427,16 +427,24 @@ def QCD(outputfile, filerange='*'):
   
   rp = {}
 
-  #old models
-  '''
-  rp['m']       = ['null']
-  rp['ctau']    = ['null'] 
-  rp['xi_pair'] = [['null', 'null']]
-  '''
+  if   paramera == 'old':
+      
+    rp['m']       = ['null']
+    rp['ctau']    = ['null'] 
+    rp['xi_pair'] = [['null', 'null']]
+    rp['xi2str']  = ['null']
+    
+    pfunc = printer
+    
+  elif paramera == 'new':
+    
+    rp['mpi_mA_pair'] = [['null', 'null']]
+    rp['ctau']        = ['null']
+
+    pfunc = printer_newmodels
   
-  #new models
-  rp['mpi_mA_pair'] = [['null', 'null']]
-  rp['ctau']        = ['null']
+  else:
+    raise Exception('Unknown model string')
 
   for i in range(len(processes)):
 
@@ -460,15 +468,14 @@ def QCD(outputfile, filerange='*'):
       'isMC':            isMC,
       'maxevents_scale': maxevents_scale
     }
-
+    
     if i == 0:
-      printer_newmodels(**param)
+      pfunc(**param)
     else:
-      printer_newmodels(**param, flush_index=i)
+      pfunc(**param, flush_index=i)
 
-
-
-def data(outputfile, filerange='*', period='B'):
+     
+def data(outputfile, filerange='*', period='B', paramera='old'):
 
   processes = None
   
@@ -502,18 +509,26 @@ def data(outputfile, filerange='*', period='B'):
   else:
     raise Exception(__name__ + f'.data: Unknown period "{period}" chosen')
   
-  rp              = {}
+  rp = {}
   
-  #old models
-  '''
-  rp['m']       = ['null']
-  rp['ctau']    = ['null'] 
-  rp['xi_pair'] = [['null', 'null']]
-  '''
-  
-  #new models
-  rp['mpi_mA_pair'] = [['null', 'null']]
-  rp['ctau']        = ['null']
+  if   paramera == 'old':
+    
+    rp['m']         = ['null']
+    rp['ctau']      = ['null'] 
+    rp['xi_pair']   = [['null', 'null']]
+    rp['xi2str']    = ['null']
+    
+    pfunc = printer
+    
+  elif paramera == 'new':
+    
+    rp['mpi_mA_pair'] = [['null', 'null']]
+    rp['ctau']    = ['null']
+    
+    pfunc = printer_newmodels
+      
+  else:
+    raise Exception('Unknown model type')
   
   for i in range(len(processes)):
 
@@ -522,7 +537,7 @@ def data(outputfile, filerange='*', period='B'):
     filename        = f'output_{filerange}.root'
     force_xs        = 'false'
     isMC            = 'false'
-    xs              =  2799000.0 # dummy value
+    xs              =  1.0
     maxevents_scale = '1.0'
     # ------------------------------------------
 
@@ -540,15 +555,16 @@ def data(outputfile, filerange='*', period='B'):
     }
 
     if i == 0:
-      printer_newmodels(**param)
+      pfunc(**param)
     else:
-      printer_newmodels(**param, flush_index=i)
+      pfunc(**param, flush_index=i)
 
 
 if __name__ == '__main__':
 
   parser = argparse.ArgumentParser(description='Generate some YAML-files.')
   parser.add_argument('--process',    type=str, default='vector')
+  parser.add_argument('--paramera',   type=str, default='new')
   parser.add_argument('--filerange',  type=str, default='*')
   parser.add_argument('--outputfile', type=str, default=None)
   args = parser.parse_args()
@@ -582,16 +598,16 @@ if __name__ == '__main__':
     scenarioC(outputfile=outputfile, filerange=args.filerange)
 
   elif args.process == 'QCD':
-    QCD(outputfile=outputfile, filerange=args.filerange)
+    QCD(outputfile=outputfile, filerange=args.filerange,  paramera=args.paramera)
   
   elif args.process == 'data-B':
-    data(outputfile=outputfile, filerange=args.filerange, period='B')
+    data(outputfile=outputfile, filerange=args.filerange, period='B', paramera=args.paramera)
 
   elif args.process == 'data-C':
-    data(outputfile=outputfile, filerange=args.filerange, period='C')
+    data(outputfile=outputfile, filerange=args.filerange, period='C', paramera=args.paramera)
   
   elif args.process == 'data-D':
-    data(outputfile=outputfile, filerange=args.filerange, period='D')
+    data(outputfile=outputfile, filerange=args.filerange, period='D', paramera=args.paramera)
   
   else:
     print('Error: unknown --process chosen (run --help)')
