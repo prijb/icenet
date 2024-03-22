@@ -150,9 +150,9 @@ train_runmode:
     #- iceboost01-DA
     #- iceboost01-DA-0p1
     #- iceboost01-DA-0p15
-    #- iceboost01-DA-0p175
+    - iceboost01-DA-0p175
     #- iceboost01-DA-0p2
-    - xgb01
+    #- xgb01
     
     #- xgb01-no-mass
     #- xgb01-no-jets

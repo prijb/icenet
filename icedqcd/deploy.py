@@ -249,9 +249,9 @@ def process_data(args):
                     func_predict, model = get_predictor(args=args, param=param, feature_names=ids)
 
                     #This makes an early exit to save a pretrained model
-                    #model.save_model("/vols/cms/pb4918/model_scouting_scenarioA_DA.model")
-                    #import sys
-                    #sys.exit()
+                    model.save_model("/vols/cms/pb4918/model_scouting_scenarioA_DA.model")
+                    import sys
+                    sys.exit()
 
                     ## 4. ** Conditional model **
                     if args['use_conditional']:
