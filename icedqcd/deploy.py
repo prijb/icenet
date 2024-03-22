@@ -248,9 +248,10 @@ def process_data(args):
                     ## 3. Get the MVA-model
                     func_predict, model = get_predictor(args=args, param=param, feature_names=ids)
 
-                    model.save_model("/vols/cms/pb4918/model_scouting_scenarioA_xgb_DA.model")
-                    import sys
-                    sys.exit()
+                    #This makes an early exit to save a pretrained model
+                    #model.save_model("/vols/cms/pb4918/model_scouting_scenarioA_DA.model")
+                    #import sys
+                    #sys.exit()
 
                     ## 4. ** Conditional model **
                     if args['use_conditional']:
