@@ -844,7 +844,8 @@ def analyze_1D_fit(hist, param, fitfunc, cfunc, par, cov, var2pos, chi2, ndof, n
 
     ## LOWER PULL PLOT
     plt.sca(ax[1])
-    iceplot.plot_horizontal_line(ax[1], ypos=0.0)
+    iceplot.plot_horizontal_line(ax[1])
+    #iceplot.plot_horizontal_line(ax[1], ypos=0.0)
 
     # Compute fit function values
     fnew = interpolate.interp1d(x=x, y=yy)
@@ -934,13 +935,15 @@ def read_yaml_input(inputfile):
         return y
 
     # Finally collect all
-    param  = {'input_path':   steer['input_path'],
-              'years':        steer['years'],
+    param  = {'input_path':   steer['file_format']['input_path'],
+              'years':        steer['file_format']['years'],
+              'output_name':  steer['file_format']['output_name'],
+              'file_format':  steer['file_format'],
+              'histogram_format': steer['histogram_format'],
               'systematics':  steer['systematics'],
               'variations':   steer['variations'],
               'fitrange':     steer['fitrange'],
               'num_cpus':     steer['num_cpus'],
-              'output_name':  steer['output_name'],
               'start_values': start_values,
               'limits':       limits, 
               'fixed':        fixed,
@@ -958,118 +961,57 @@ def read_yaml_input(inputfile):
 # ========================================================================
 # Input processing
 
-def get_rootfiles_jpsi(input_path='/', years=[2016, 2017, 2018], systematics=['Nominal']):
+def get_rootfiles_jpsi(file_format, histogram_format, systematics):
     """
     Return rootfile names for the J/psi (muon) study.
     """
+    input_path = file_format['input_path']
+    years      = file_format['years']
+    variable_dict = histogram_format['variables']
+
+
     all_years = []
-    setup = [
-    
-    ## Num/Den type A
-    {
-        'NUM_DEN': ['LooseID', 'TrackerMuons'],
-        'OBS':     ['absdxy'],
-        'BINS':    [[1,2,3]]
-    },
-    {
-        'NUM_DEN': ['LooseID', 'TrackerMuons'],
-        'OBS':     ['absdxy_hack', 'pt'],
-        'BINS':    [[1,2,3,4], [1,2,3,4,5]]
-    },
-    {
-        'NUM_DEN': ['LooseID', 'TrackerMuons'],
-        'OBS':     ['absdxy', 'pt'],
-        'BINS':    [[1,2,3], [1,2,3,4,5]]
-    },
-    {
-        'NUM_DEN': ['LooseID', 'TrackerMuons'],
-        'OBS':     ['abseta', 'pt'],
-        'BINS':    [[1,2,3,4,5], [1,2,3,4,5]]
-    },
-    {
-        'NUM_DEN': ['LooseID', 'TrackerMuons'],
-        'OBS':     ['eta'],
-        'BINS':    [[1,2,3,4,5,6,7,8,9,10]]
-    },
-    
-    ## Num/Den type B
-    {
-        'NUM_DEN': ['MyNum', 'MyDen'],
-        'OBS':     ['absdxy'],
-        'BINS':    [[1,2,3]]
-    },
-    {
-        'NUM_DEN': ['MyNum', 'MyDen'],
-        'OBS':     ['absdxy_hack', 'pt'],
-        'BINS':    [[1,2,3,4], [1,2,3,4,5]]
-    },
-    {
-        'NUM_DEN': ['MyNum', 'MyDen'],
-        'OBS':     ['absdxy', 'pt'],
-        'BINS':    [[1,2,3], [1,2,3,4,5]]
-    },
-    {
-        'NUM_DEN': ['MyNum', 'MyDen'],
-        'OBS':     ['abseta', 'pt'],
-        'BINS':    [[1,2,3,4,5], [1,2,3,4,5]]
-    },
-    {
-        'NUM_DEN': ['MyNum', 'MyDen'],
-        'OBS':     ['eta'],
-        'BINS':    [[1,2,3,4,5,6,7,8,9,10]]
-    }
-    ]
-    
 
     # Loop over datasets
+    # This is assuming that one file has all the histograms
     for YEAR in years:
         info = {}
-        
-        for GENTYPE in ['JPsi_pythia8', f'Run{YEAR}_UL']: # Data or MC
+        for GENTYPE in file_format['gentypes']:
             files = []
-            
             for SYST in systematics:
-                
-                for s in setup:    
-                    
-                    NUM_DEN = s['NUM_DEN']
-                    OBS     = s['OBS']
-                    BINS    = s['BINS']
-
-                    # 1D histograms
-                    if   len(OBS) == 1:
-
-                        rootfile = f'{input_path}/Run{YEAR}_UL/{GENTYPE}/{SYST}/NUM_{NUM_DEN[0]}_DEN_{NUM_DEN[1]}_{OBS[0]}.root'
-                        
-                        # Binning
-                        for BIN0 in BINS[0]:
-                            for PASS in ['Pass', 'Fail']:
-                                
-                                tree = f'NUM_{NUM_DEN[0]}_DEN_{NUM_DEN[1]}_{OBS[0]}_{BIN0}_{PASS}'
-                                
-                                file = {'OBS1': OBS[0], 'BIN1': BIN0, 'OBS2': None, 'BIN2': None, 'SYST': SYST, 'rootfile': rootfile, 'tree': tree}
-                                files.append(file)
-
-                    # 2D histograms
-                    elif len(OBS) == 2:
-                        
-                        rootfile = f'{input_path}/Run{YEAR}_UL/{GENTYPE}/{SYST}/NUM_{NUM_DEN[0]}_DEN_{NUM_DEN[1]}_{OBS[0]}_{OBS[1]}.root'
-                        
-                        # Binning
-                        for BIN0 in BINS[0]:
-                            for BIN1 in BINS[1]:
-                                for PASS in ['Pass', 'Fail']:
-                                    
-                                    tree = f'NUM_{NUM_DEN[0]}_DEN_{NUM_DEN[1]}_{OBS[0]}_{BIN0}_{OBS[1]}_{BIN1}_{PASS}'
-                                    
-                                    file = {'OBS1': OBS[0], 'BIN1': BIN0, 'OBS2': OBS[1], 'BIN2': BIN1, 'SYST': SYST, 'rootfile': rootfile, 'tree': tree}
-                                    files.append(file)
+                #Iterate over all variable arrangements
             
+                for arrangement in variable_dict['arrangements']:
+                    rootfile = f'{input_path}/{GENTYPE}_{YEAR}.root'
+
+                    #1D histogram
+                    if(len(arrangement) == 1): 
+                        BINS_0 = variable_dict[arrangement[0]]['bins']
+                        for BIN0 in BINS_0:
+                            for PASS in histogram_format['types']:
+                                hist_name = (histogram_format['histogram_template_1d']).replace("var", arrangement[0]).replace("bin", str(BIN0)).replace("type", PASS)
+                                tree = f'{hist_name}'
+
+                                file = {'OBS1': arrangement[0], 'BIN1': BIN0, 'OBS2': None, 'BIN2': None, 'SYST': SYST, 'rootfile': rootfile, 'tree': tree}
+                                files.append(file)
+                    
+                    #2D histogram
+                    elif(len(arrangement) == 2):
+                        BINS_0 = variable_dict[arrangement[0]]['bins']
+                        BINS_1 = variable_dict[arrangement[1]]['bins']
+                        for BIN0 in BINS_0:
+                            for BIN1 in BINS_1:
+                                for PASS in histogram_format['types']:
+                                    hist_name = (histogram_format['histogram_template_2d']).replace("var1", arrangement[0]).replace("bin1", str(BIN0)).replace("var2", arrangement[1]).replace("bin2", str(BIN1)).replace("type", PASS)
+                                    tree = f'{hist_name}'
+                                    file = {'OBS1': arrangement[0], 'BIN1': BIN0, 'OBS2': arrangement[1], 'BIN2': BIN1, 'SYST': SYST, 'rootfile': rootfile, 'tree': tree}
+                                    files.append(file)
             info[GENTYPE] = files
 
         all_years.append({'YEAR': YEAR, 'info': info})
-
+    
     return all_years
+                    
 
 @ray.remote
 def fit_task_ray(f, inputparam, savepath, YEAR, GENTYPE):
@@ -1083,7 +1025,6 @@ def fit_task(f, inputparam, savepath, YEAR, GENTYPE):
 
     # ====================================================================
     # Collect fit parametrization setup
-
     param   = inputparam['param']
     fitfunc = inputparam['fitfunc']
     cfunc   = inputparam['cfunc']
@@ -1142,7 +1083,7 @@ def run_jpsi_fitpeak(inputparam, savepath):
     #np.seterr(all='print') # Numpy floating point error treatment
     param     = inputparam['param']
     
-    all_years = get_rootfiles_jpsi(input_path=param['input_path'], years=param['years'], systematics=param['systematics'])
+    all_years = get_rootfiles_jpsi(file_format=param['file_format'], histogram_format=param['histogram_format'], systematics=param['systematics'])
 
     from pprint import pprint
     pprint(all_years)
@@ -1202,7 +1143,7 @@ def run_jpsi_tagprobe(inputparam, savepath):
         N      = {}
         N_err  = {}
 
-        for PASS in ['Pass', 'Fail']:
+        for PASS in param['histogram_format']['types']:
 
             filename = f"{total_savepath}/{f'{tree}_{PASS}'}.pkl"
             cprint(f'Reading fit results from: {filename} (pickle)', 'green')         
@@ -1216,15 +1157,22 @@ def run_jpsi_tagprobe(inputparam, savepath):
     
     # ====================================================================
     ## Read filenames
-    all_years = get_rootfiles_jpsi(input_path=param['input_path'], years=param['years'])
+    all_years = get_rootfiles_jpsi(file_format=param['file_format'], histogram_format=param['histogram_format'], systematics=param['systematics'])
 
     ### Loop over datasets
     for y in all_years:
         
         YEAR     = y['YEAR']
         
-        mc_tag   = f'JPsi_pythia8'
-        data_tag = f'Run{YEAR}_UL'
+        data_tag = None
+        mc_tag   = None
+
+        #First tag is data
+        data_tag = param['file_format']['gentypes'][0]
+        #Second tag is MC (if it exists)
+        if len(param['file_format']['gentypes']) == 2:
+            mc_tag = param['file_format']['gentypes'][1]
+        
 
         # Loop over observables -- pick 'data_tag' (both data and mc have the same observables)
         for f in y['info'][data_tag]:
@@ -1236,33 +1184,40 @@ def run_jpsi_tagprobe(inputparam, savepath):
             if not os.path.exists(total_savepath):
                 os.makedirs(total_savepath)
 
-            # Pick Pass -- just a pick (both Pass and Fail will be used)
-            if '_Pass' in f['tree']:
+            pass_string = param["histogram_format"]["types"][0]
+            fail_string = param["histogram_format"]["types"][1]
 
-                tree    = f['tree'].replace("_Pass", "")
+            # Pick a type -- just a pick (both types will be used)
+            if f'_{pass_string}' in f['tree']:
+
+                tree    = f['tree'].replace(f"_{pass_string}", "")
                 eff     = {}
                 eff_err = {}
 
                 # Loop over data and MC
-                for GENTYPE in [data_tag, mc_tag]:
+                for GENTYPE in param['file_format']['gentypes']:
 
                     ### Compute Tag & Probe efficiency
                     N,N_err          = tagprobe(tree=tree, total_savepath=f'{savepath}/Run{YEAR}/{GENTYPE}/{SYST}')
-                    eff[GENTYPE]     = N['Pass'] / (N['Pass'] + N['Fail'])
-                    eff_err[GENTYPE] = statstools.tpratio_taylor(x=N['Pass'], y=N['Fail'], x_err=N_err['Pass'], y_err=N_err['Fail'])
+                    eff[GENTYPE]     = N[pass_string] / (N[pass_string] + N[fail_string])
+                    eff_err[GENTYPE] = statstools.tpratio_taylor(x=N[pass_string], y=N[fail_string], x_err=N_err[pass_string], y_err=N_err[fail_string])
 
                     ### Print out
                     print(f'[{GENTYPE}]')
-                    print(f'N_pass:     {N["Pass"]:0.1f} +- {N_err["Pass"]:0.1f} (signal fit)')
-                    print(f'N_fail:     {N["Fail"]:0.1f} +- {N_err["Fail"]:0.1f} (signal fit)')
+                    print(f'N_pass:     {N[pass_string]:0.1f} +- {N_err[pass_string]:0.1f} (signal fit)')
+                    print(f'N_fail:     {N[fail_string]:0.1f} +- {N_err[fail_string]:0.1f} (signal fit)')
                     print(f'Efficiency: {eff[GENTYPE]:0.3f} +- {eff_err[GENTYPE]:0.3f} \n')
-                    
-                ### Compute scale factor Data / MC
-                scale     = eff[data_tag] / eff[mc_tag]
-                scale_err = statstools.ratio_eprop(A=eff[data_tag], B=eff[mc_tag], \
-                                sigmaA=eff_err[data_tag], sigmaB=eff_err[mc_tag], sigmaAB=0)
 
-                print(f'Data / MC:  {scale:0.3f} +- {scale_err:0.3f} (scale factor) \n')
+                scale = None
+                scale_err = None        
+
+                ### Compute scale factor Data / MC
+                if mc_tag is not None:
+                    scale     = eff[data_tag] / eff[mc_tag]
+                    scale_err = statstools.ratio_eprop(A=eff[data_tag], B=eff[mc_tag], \
+                                    sigmaA=eff_err[data_tag], sigmaB=eff_err[mc_tag], sigmaAB=0)
+
+                    print(f'Data / MC:  {scale:0.3f} +- {scale_err:0.3f} (scale factor) \n')
 
                 ### Save results
                 outdict  = {'eff': eff, 'eff_err': eff_err, 'scale': scale, 'scale_err': scale_err}
@@ -1393,7 +1348,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--analyze',   help="Fit and analyze", action="store_true")
     parser.add_argument('--group',     help="Collect and group results", action="store_true")
-    parser.add_argument('--inputfile', type=str, default='configs/peakfit/tune2.yml', help="Steering input YAML file", nargs='?')
+    parser.add_argument('--inputfile', type=str, default='configs/peakfit/tunetest.yml', help="Steering input YAML file", nargs='?')
     
     args = parser.parse_args()
     print(args)

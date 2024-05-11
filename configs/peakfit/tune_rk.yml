@@ -1,0 +1,122 @@
+# Peakfit steering code
+#
+# Remember that yaml scientific notation requires 1.0 (dots)
+# and (+) and (-) for the exponent (e.g. 1.0e+8)
+#
+#
+# Tips: One can simplify the model by settings some parameters to
+# their "symmetric" (e.g. 0) values and fixing those.
+#
+# m.mieskolainen@imperial.ac.uk, 2023
+#
+# Steering yaml is modified to give more customisability for
+# specifying the input file names, variables, histogram name,
+# variable combinations and bins per variable 
+
+
+file_format:
+  input_path:   '/vols/cms/pb4918/rk_sf'
+  output_name:  'tune_rk'
+  
+  #Example: data_2022.root is constructed by {input_path}/{gentype}_{year}.root
+  years:    [2018] # [2016, 2017, 2018]
+  histograms_per_file: 0   # 0 = all histograms are contained in one file, 1 = one histogram per file
+  gentypes: ['data', 'mc'] # Replace with the label of your root file for data and MC
+
+
+histogram_format:
+  #Example: h_lxy_0_pass is constructed by histogram_template_1d 'h_var_bin_type' for the arrangement ['lxy'] (better for 1D histograms) 
+  #Example: h_lxy_0_pT_100_pass is constructed by histogram_template_2d 'h_var1_bin1_var2_bin2_type' for the arrangement ['lxy', 'pT'] 
+  #by using the pT bin 100/1000 (whichever one is used in writing the histogram)
+  #Example: h_lxy_1_pT_2_fail is constructed by histogram_template_2d for the arrangement ['lxy', 'pT']  
+  histogram_template_1d: 'h_var1_bin1_var2_bin2_type'
+  histogram_template_2d: 'h_var1_bin1_var2_bin2_type'
+  types: ['Pass', 'Fail']
+  variables:
+    dxysig:
+      bins: [0, 1, 2, 3, 4, 5, 6, 7]
+    dxy:
+      #bins: [0, 1, 2, 3]
+      bins: [1, 100]
+    pT:
+      bins: [0, 1, 2, 3, 4]
+    arrangements: [['dxy', 'pT']]
+
+
+
+#fitrange: [2.91, 3.29] # Nominal fit window (GeV)
+fitrange: [2.80, 3.40] # Nominal fit window (GeV)
+
+systematics: ['Nominal'] # ['Nominal', 'nVertices_Up', 'nVertices_Down']
+
+# List of systematic variations active
+variations: ['DEFAULT', 'MASS-WINDOW-DOWN', 'MASS-WINDOW-UP']
+
+num_cpus: 0 # put 0 for automatic, set manually if problems
+
+
+fit:
+
+  S:
+    func:    'DSCB_pdf'
+    args:
+      norm:     True
+    
+    # Function weight (fit contribution) parameter
+    w_start:  100.0
+    w_limit:  [1.0e-4, 1.0e+5]
+    w_fixed:  False
+    
+    p_name:   ['M0', 'sigma', 'n_low', 'alpha_low', 'n_high', 'alpha_high']
+    p_start:  [3.097, 0.03, 1.5, 1.1, 1.5, 1.1]
+    p_limit:  [[3.085, 3.12], [0.015, 0.05], [1.001, 20.0], [0.001, 2.0], [1.001, 20.0], [0.001, 2.0]]
+    #p_fixed:  [False, False, False, False, False, False]
+    p_fixed:  [True, False, False, False, False, False] #Forcing some parameter fixing since the number of nonzero bins is small
+  
+  B:
+    func:    'exp_pdf'
+    args:
+      norm:     True
+      #Nmin:     null # not active
+    
+    # Function weight (fit contribution) parameter
+    w_start:  0.1
+    w_limit:  [1.0e-4, 1.0e+5]
+    w_fixed:  False
+
+    p_name:   ['lambda']
+    p_start:  [1.0e-4]
+    p_limit:  [[1.0e-5, 4.0]]
+    p_fixed:  [False]
+
+
+  # Add here more fit components in linear superposition, by giving a unique string label
+  # ...
+
+
+# Fit algorithm parameters
+techno:
+  losstype: 'nll'               # 'chi2', 'nll' or 'wasserstein'
+  use_limits: True              # Use parameter bounds
+  zerobin: 0.1                  # Minimum number of counts in a valid bin
+  
+  # Use enough calls / iterations (otherwise can get stuck in bad local minima)
+  
+  ncall_scipy_simplex: 0           # Number of scipy search calls
+  ncall_mystic_diffev2:     1      # Number of Mystic solver calls
+  ncall_mystic_fmin_powell: 1      # Number of Mystic solver calls
+
+  ncall_minuit_scan:     0         # Number of brute force 1D-scan calls
+  ncall_minuit_simplex:  0         # Number of Nelder-Mead simplex search calls
+  ncall_minuit_gradient: 10000     # Number of Minuit gradient search calls
+  
+  minos: False       # If True, Minuit MINOS uncertainties (slower but best), otherwise HESSE
+
+  max_chi2: 1200    # Maximum chi2/ndf for a succesful fit
+  min_count: 5      # Minimum number of entries in the histogram
+  max_trials: 3     # Number of restarts
+
+  set_to_nan: True  # Set parameters after the fit to NaN if not passing max_chi2 or min_count
+
+  strategy: 1       # Default 1
+  tol: 0.1          # Default 0.1, https://iminuit.readthedocs.io/en/stable/reference.html#iminuit.Minuit.tol
