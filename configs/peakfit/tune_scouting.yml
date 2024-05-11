@@ -28,15 +28,18 @@ histogram_format:
   #Example: h_lxy_0_pass is constructed by histogram_template_1d 'h_var_bin_type' for the arrangement ['pT'] 
   #Example: h_lxy_0_pT_100_pass is constructed by histogram_template_1d 'h_var1_bin1_var2_bin2_type' for the arrangement ['lxy']
   #Example: h_lxy_1_pT_2_fail is constructed by histogram_template_2d for the arrangement ['lxy', 'pT'] 
-  #histogram_template_1d: 'h_var_bin_type'
-  histogram_template_1d: 'h_var1_bin1_var2_bin2_type'
+  histogram_template_1d: 'h_var_bin_type'
   histogram_template_2d: 'h_var1_bin1_var2_bin2_type'
   types: ['pass', 'fail']
   variables:
     lxy:
-      bins: [0, 1, 2, 3, 4, 5, 6, 7]
+      #bins: [0, 1, 2, 3, 4, 5, 6, 7]      #2D lxy-pt configuration (same bins for 1D)
+      #bins: [100]                         #1D pT configuration
+      bins: [0, 1, 2, 3, 4, 5, 6, 7, 100] #2D lxy-pt + 1D pT configuration
     pT:
-      bins: [0, 1, 2, 3]
+      #bins: [0, 1, 2, 3]             #2D lxy-pt configuration
+      #bins: [100]                    #1D pT configuration
+      bins: [0, 1, 2, 3, 100]        #2D lxy-pt + 1D lxy configuration
     arrangements: [['lxy', 'pT']]
 
 
@@ -49,7 +52,7 @@ systematics: ['Nominal'] # ['Nominal', 'nVertices_Up', 'nVertices_Down']
 # List of systematic variations active
 variations: ['DEFAULT', 'MASS-WINDOW-DOWN', 'MASS-WINDOW-UP']
 
-num_cpus: 1 # put 0 for automatic, set manually if problems
+num_cpus: 8 # put 0 for automatic, set manually if problems (NOTE: automatic -> 72 cores seems to not work atm)
 
 
 fit:

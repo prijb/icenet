@@ -29,17 +29,20 @@ histogram_format:
   #Example: h_lxy_0_pT_100_pass is constructed by histogram_template_2d 'h_var1_bin1_var2_bin2_type' for the arrangement ['lxy', 'pT'] 
   #by using the pT bin 100/1000 (whichever one is used in writing the histogram)
   #Example: h_lxy_1_pT_2_fail is constructed by histogram_template_2d for the arrangement ['lxy', 'pT']  
-  histogram_template_1d: 'h_var1_bin1_var2_bin2_type'
+  histogram_template_1d: 'h_var_bin_type'
   histogram_template_2d: 'h_var1_bin1_var2_bin2_type'
   types: ['Pass', 'Fail']
   variables:
     dxysig:
       bins: [0, 1, 2, 3, 4, 5, 6, 7]
     dxy:
-      #bins: [0, 1, 2, 3]
-      bins: [1, 100]
+      #bins: [0, 1, 2, 3]                #2D dxy-pt configuration
+      #bins: [0, 1, 2, 3, 4, 5, 6, 7, 8] #1D dxy configuration
+      bins: [100]                        #1D pT configuration
     pT:
-      bins: [0, 1, 2, 3, 4]
+      #bins: [0, 1, 2, 3, 4]               #2D dxy-pt configuration
+      #bins: [1000]                        #1D dxy configuration
+      bins: [0, 1, 2, 3, 4, 5, 6, 7, 8]    #1D pT configuration
     arrangements: [['dxy', 'pT']]
 
 
@@ -52,7 +55,7 @@ systematics: ['Nominal'] # ['Nominal', 'nVertices_Up', 'nVertices_Down']
 # List of systematic variations active
 variations: ['DEFAULT', 'MASS-WINDOW-DOWN', 'MASS-WINDOW-UP']
 
-num_cpus: 0 # put 0 for automatic, set manually if problems
+num_cpus: 8 # put 0 for automatic, set manually if problems (NOTE: automatic -> 72 cores seems to not work atm)
 
 
 fit:

@@ -844,8 +844,8 @@ def analyze_1D_fit(hist, param, fitfunc, cfunc, par, cov, var2pos, chi2, ndof, n
 
     ## LOWER PULL PLOT
     plt.sca(ax[1])
-    iceplot.plot_horizontal_line(ax[1])
-    #iceplot.plot_horizontal_line(ax[1], ypos=0.0)
+    #iceplot.plot_horizontal_line(ax[1])
+    iceplot.plot_horizontal_line(ax[1], ypos=0.0) #Note: Function modified to accept ypos
 
     # Compute fit function values
     fnew = interpolate.interp1d(x=x, y=yy)
@@ -1001,6 +1001,9 @@ def get_rootfiles_jpsi(file_format, histogram_format, systematics):
                         BINS_1 = variable_dict[arrangement[1]]['bins']
                         for BIN0 in BINS_0:
                             for BIN1 in BINS_1:
+                                #Remove cases of h_var1_100_var2_100_pass/fail (only applies if using 2D format for 1D histograms)
+                                if BIN0 == 100 and BIN1 == 100: 
+                                    continue
                                 for PASS in histogram_format['types']:
                                     hist_name = (histogram_format['histogram_template_2d']).replace("var1", arrangement[0]).replace("bin1", str(BIN0)).replace("var2", arrangement[1]).replace("bin2", str(BIN1)).replace("type", PASS)
                                     tree = f'{hist_name}'
@@ -1348,7 +1351,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--analyze',   help="Fit and analyze", action="store_true")
     parser.add_argument('--group',     help="Collect and group results", action="store_true")
-    parser.add_argument('--inputfile', type=str, default='configs/peakfit/tunetest.yml', help="Steering input YAML file", nargs='?')
+    parser.add_argument('--inputfile', type=str, default='configs/peakfit/tune_scouting.yml', help="Steering input YAML file", nargs='?')
     
     args = parser.parse_args()
     print(args)

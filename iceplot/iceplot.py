@@ -137,11 +137,11 @@ def stepspace(start, stop, step):
     return np.arange(start, stop + step, step)
 
 
-def plot_horizontal_line(ax, color=(0.5,0.5,0.5), linewidth=0.9):
+def plot_horizontal_line(ax, color=(0.5,0.5,0.5), ypos=1, linewidth=0.9):
     """ For the ratio plot
     """
     xlim = ax.get_xlim()
-    ax.plot(np.linspace(xlim[0], xlim[1], 2), np.array([1,1]), color=color, linewidth=linewidth)
+    ax.plot(np.linspace(xlim[0], xlim[1], 2), np.array([ypos,ypos]), color=color, linewidth=linewidth)
 
 
 def tick_calc(lim, step, N=6):
