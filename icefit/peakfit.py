@@ -1048,8 +1048,12 @@ def fit_task(f, inputparam, savepath, YEAR, GENTYPE):
 
     # Create savepath
     total_savepath = f'{savepath}/Run{YEAR}/{GENTYPE}/{SYST}'
+    #if not os.path.exists(total_savepath):
+    #    os.makedirs(total_savepath)
+
+    #Modified to account for Race condition problems due to Ray
     if not os.path.exists(total_savepath):
-        os.makedirs(total_savepath)
+        os.makedirs(total_savepath, exist_ok=True)
 
     # Save the fit plot
     plt.savefig(f'{total_savepath}/{tree}.pdf')
