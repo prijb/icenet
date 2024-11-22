@@ -1245,6 +1245,10 @@ def train_models(data_trn, data_val, args=None):
                         'param':       param}
                     
                     set_distillation_drain(ID=ID, param=param, inputs=inputs, idx=idx_trn, dtype='numpy')
+
+                    #print(f'Debug: ID = {ID}')
+                    #print(f'Debug: Raytune active models: {args["raytune"]["param"]["active"]}')
+                    #print(f'Is ID in active models: {ID in args["raytune"]["param"]["active"]}')
                     
                     if ID in args['raytune']['param']['active']:
                         model = train.raytune_main(inputs=inputs, train_func=iceboost.train_xgb)
@@ -1748,7 +1752,6 @@ def plot_XYZ_wrap(func_predict, x_input, y, weights, label, targetdir, args,
     """
     # -----------------------------
     # Prepare output folders
-
     targetdir = os.path.join(f'{args["plotdir"]}', 'eval')
 
     subdirs = ['ROC', 'MVA', 'COR']
@@ -1769,14 +1772,11 @@ def plot_XYZ_wrap(func_predict, x_input, y, weights, label, targetdir, args,
     # ** Compute predictions once and for all here **
     y_pred = func_predict(x_input)
     y_preds.append(copy.deepcopy(y_pred))
-    
-    
+        
     # --------------------------------------
     ### Output score re-weighted observables
-    
+
     if 'OBS_reweight' in args['plot_param'] and args['plot_param']['OBS_reweight']['active']:
-        
-        print('OBS_reweight')
         
         pick_ind, var_names = aux.pick_index(all_ids=ids_RAW, vars=args['plot_param']['OBS_reweight']['var'])
         
@@ -1874,15 +1874,10 @@ def plot_XYZ_wrap(func_predict, x_input, y, weights, label, targetdir, args,
     
     # --------------------------------------
     ### ROC plots
-    
     if 'ROC' in args['plot_param'] and args['plot_param']['ROC']['active']:
-
-        print('ROC')
         
         def plot_helper(mask, sublabel, pathlabel):
-            
-            print(f'Computing aux.Metric for {sublabel}')
-            
+
             metric = aux.Metric(y_true=y[mask], y_pred=y_pred[mask],
                 weights=weights[mask] if weights is not None else None,
                 num_bootstrap=args['plot_param']['ROC']['num_bootstrap'])
@@ -1897,7 +1892,7 @@ def plot_XYZ_wrap(func_predict, x_input, y, weights, label, targetdir, args,
             roc_labels[sublabel].append(label)
             roc_paths[sublabel].append(pathlabel)
             roc_filters[sublabel].append(mask)
-        
+
         # ** All inclusive **
         mask = np.ones(len(y_pred), dtype=bool)
         plot_helper(mask=mask, sublabel='inclusive', pathlabel='inclusive')

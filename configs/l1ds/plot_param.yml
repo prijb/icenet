@@ -1,3 +1,4 @@
+#Filter here causes problems
 FILTER: &FILTER
   
   filter[0]:
@@ -6,7 +7,20 @@ FILTER: &FILTER
   
   filter[1]:
     operator: null            # null (unary), 'cartesian_and', 'cartesian_or'
-    sets: [0]
+    sets: [0]                 # input set ids (one or several)
+  
+  filter[2]:
+    operator: null            # null (unary), 'cartesian_and', 'cartesian_or'
+    sets: [1]                 # input set ids (one or several)
+  
+  filter[3]:
+    operator: 'cartesian_and' # null (unary), 'cartesian_and', 'cartesian_or'
+    sets: [0,1,2]             # input set ids (one or several)
+    match: [0,2]              # require pair/N-tuplet wise cartesian combination match between these set indices
+  
+  filter[4]:
+    operator: null            # null (unary), 'cartesian_and', 'cartesian_or'
+    sets: [2]                 # input set ids (one or several)
     
   # ... more filters here
   
@@ -19,17 +33,20 @@ basic:
   exclude_vals: [null, -999.0]
   plot_unweighted: False
 
-corrmat:
-  active: False
+corrmat:  
+  active: True
 
 contours:
+  active: False
+
+OBS_reweight:
   active: False
 
 ROC:
   active: True
   num_bootstrap: 50
   xmin: 1.0E-6
-  set_filter: *FILTER
+  #set_filter: *FILTER
 
 ## Binned ROC plots can be 1D or 2D
 ROC_binned:
@@ -54,7 +71,7 @@ ROC_binned:
 MVA_output:
   active: True
   edges: 80
-  set_filter: *FILTER
+  #set_filter: *FILTER
 
 ## (MVA output x External variable) density (2D)
 MVA_2D:

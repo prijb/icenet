@@ -4,9 +4,9 @@
 
 param:
   
-  #active:         ['xgb1']
-  active:  [null]
-  num_samples:    1000  # Trial count parameter
+  active:         ['xgb01']
+  #active:  [null]
+  num_samples:    10  # Trial count parameter
 
 setup:
 
@@ -19,5 +19,27 @@ setup:
 
     param:
       
+      #num_boost_round:
+      #  type: "tune.randint(20, 400)"
       num_boost_round:
-        type: "tune.randint(20, 400)"
+        type: "tune.randint(50, 251)"
+      learning_rate:
+        type: "tune.loguniform(1e-5, 1e-1)"
+      gamma:
+        type: "tune.uniform(0, 2.0)"
+      max_depth:
+        type: "tune.randint(2, 9)"
+      reg_lambda:
+        type: "tune.loguniform(1e-2, 10.0)"
+      reg_alpha:
+        type: "tune.loguniform(1e-2, 10.0)"
+      min_child_weight:
+        type: "tune.loguniform(1e-2, 20.0)"
+      subsample:
+        type: "tune.uniform(0.6, 1.0)"
+      colsample_bytree:
+        type: "tune.uniform(0.6, 1.0)"
+      colsample_bylevel:
+        type: "tune.uniform(0.6, 1.0)"
+      colsample_bynode:
+        type: "tune.uniform(0.6, 1.0)"

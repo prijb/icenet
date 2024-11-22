@@ -34,7 +34,7 @@ MAIN_DOMAIN_FILTER: &MAIN_DOMAIN_FILTER
     expand: 'set'    # 'set', 'vetoset' or 'powerset'
     cutset:
       # Latex description is for boolean [0,1] per cut
-      [{cut: 'muonSV_chi2_0 > 0', latex: ['', 'muonSV_chi2_0 > 0']}]
+      - {cut: 'Jet_pt_0 > 0', latex: ['', 'Jet_pt_0 > 0']}
 
 # -----------------------------------------------
 
@@ -50,10 +50,10 @@ cutset0:
   raytune:  null
 
   cutstring: >-
-    Jet_pt[0] > 50 &&
-    Jet_pt[1] > 50 &&
-    Jet_eta[0] < 1.5 &&
-    Jet_eta[1] < 1.5 
+    Jet_pt_0 > 50 &&
+    Jet_pt_1 > 50 &&
+    Jet_eta_0 < 1.5 &&
+    Jet_eta_1 < 1.5 
   
 cut0:
   train:  'cut'
@@ -76,11 +76,11 @@ xgb01: &XGB01
   
   exclude_MVA_vars: null
   #exclude_MVA_vars: ['Jet_eta.*']
-  #include_MVA_vars: ['.*']
+  include_MVA_vars: ['.*']
   
   # general parameters
   model_param:
-    num_boost_round: 250       # number of epochs (equal to the number of trees!)
+    num_boost_round: 100       # number of epochs (equal to the number of trees!)
     booster: 'gbtree'          # 'gbtree' (default), 'dart' (dropout boosting)
     tree_method: 'hist'
     device:      'auto'        # 'auto', 'cpu', 'cuda'
