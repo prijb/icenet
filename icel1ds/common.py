@@ -141,8 +141,8 @@ def process_root(X, args, ids=None, isMC=None, return_mask=False, class_id=None,
     CUTFUNC    = globals()[args['cutfunc']]
 
     #Debug
-    print(f"FILTERFUNC: {FILTERFUNC}")
-    print(f"CUTFUNC: {CUTFUNC}")
+    #print(f"FILTERFUNC: {FILTERFUNC}")
+    #print(f"CUTFUNC: {CUTFUNC}")
     #Debug stop
 
 
@@ -166,6 +166,16 @@ def process_root(X, args, ids=None, isMC=None, return_mask=False, class_id=None,
     io.showmem()
 
     X_final = X_new[cmask]
+
+    #Debug
+    #print(f"nJet before cuts: {X.nJet[:10].to_list()}")
+    #print(f"Jet pT before cuts: {X.Jet.pt[:10].to_list()}")
+    #print(f"Jet eta before cuts: {X.Jet.eta[:10].to_list()}")
+    #print("")
+    #print(f"nJet after cuts: {X_final.nJet[:10].to_list()}")
+    #print(f"X pT after cuts: {X_final.Jet.pt[:10].to_list()}")
+    #print(f"X eta after cuts: {X_final.Jet.eta[:10].to_list()}")
+    #Debug stop
 
     #Pass through
     #X_final = copy.deepcopy(X)

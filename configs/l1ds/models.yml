@@ -1,0 +1,159 @@
+# ML model definitions
+#
+# m.mieskolainen@imperial.ac.uk, 2024
+
+# ** Model save and load parameters **
+EVAL_PARAM: &EVAL_PARAM
+  
+  tensorboard: true
+
+  # Training and validation
+  savemode: 1                  # Save and evaluate model file every n-th epoch (integer)
+                               # (BDT will save always only the last one because it contains all epochs)
+  eval_batch_size: 1024
+  
+  # Post-training evaluation
+  readmode: -1                 # specific epoch (int), -1 finds the best loss model, -2 takes the last epoch model
+  readmode_metric: 'loss'      # e.g. 'loss', 'AUC' ... [currently only 'loss']
+  readmode_operator: 'argmin'  # 
+
+
+# -----------------------------------------------
+# ** Main Domain Filter **
+MAIN_DOMAIN_FILTER: &MAIN_DOMAIN_FILTER
+  
+  filter[0]:
+    operator: null   # null (unary), cartesian_and', 'cartesian_or'
+    sets: [0]        # input set ids (one or several)
+  
+  # ... more filters here
+  
+  # --------------------
+  
+  set[0]:
+    expand: 'set'    # 'set', 'vetoset' or 'powerset'
+    cutset:
+      # Latex description is for boolean [0,1] per cut
+      [{cut: 'muonSV_chi2_0 > 0', latex: ['', 'muonSV_chi2_0 > 0']}]
+
+# -----------------------------------------------
+
+# ========================================================================
+## Classifier setup
+# ========================================================================
+
+cutset0:
+  train:   'cutset'
+  predict: 'cutset'
+  
+  label:   'cutset'
+  raytune:  null
+
+  cutstring: >-
+    Jet_pt[0] > 50 &&
+    Jet_pt[1] > 50 &&
+    Jet_eta[0] < 1.5 &&
+    Jet_eta[1] < 1.5 
+  
+cut0:
+  train:  'cut'
+  predict: 'cut'
+  label:  'Jet_pt'
+  variable: 'Jet_pt'
+  sign: 1
+  transform: null
+
+# ------------------------------------------------------------------------------------------
+
+
+# XGBoost
+# https://xgboost.readthedocs.io/en/latest/parameter.html
+xgb01: &XGB01
+  train:   'xgb'
+  predict: 'xgb'
+  label:   'XGB'
+  raytune:  xgb_trial_0
+  
+  exclude_MVA_vars: null
+  #exclude_MVA_vars: ['Jet_eta.*']
+  #include_MVA_vars: ['.*']
+  
+  # general parameters
+  model_param:
+    num_boost_round: 250       # number of epochs (equal to the number of trees!)
+    booster: 'gbtree'          # 'gbtree' (default), 'dart' (dropout boosting)
+    tree_method: 'hist'
+    device:      'auto'        # 'auto', 'cpu', 'cuda'
+    
+    learning_rate: 0.1
+    gamma: 1.67
+    max_depth: 5
+    min_child_weight: 1.0
+    max_delta_step: 1
+    subsample: 1
+
+    colsample_bytree:  0.86
+    colsample_bylevel: 0.6
+    colsample_bynode:  0.8
+    
+    reg_lambda: 2.0               # L2 regularization
+    reg_alpha: 0.05               # L1 regularization
+    
+    # learning task parameters
+    objective: 'binary:logistic'               # Note that 'multi:softprob' does not work with distillation
+    eval_metric: ['logloss']                   
+    #objective: 'custom:binary_cross_entropy'  # Use 'custom:binary_cross_entropy:hessian' for 2nd order descent
+    #eval_metric: ['custom']                   # for custom losses, otherwise 'logloss', 'mlogloss' ...
+  
+  plot_trees: false
+
+  <<: *EVAL_PARAM
+
+# ICEBOOST (XGB with torch driven custom loss)
+# https://xgboost.readthedocs.io/en/latest/parameter.html
+iceboost01: &ICEBOOST01
+  train:   'xgb'
+  predict: 'xgb_logistic'
+  label:   'ICEBOOST'
+  raytune:  xgb_trial_0
+
+  exclude_MVA_vars: ['muonSV_mass.*', 'SV_mass.*', 'Jet_mass.*']
+  #include_MVA_vars: ['.*']
+  
+  # general parameters
+  model_param:
+    num_boost_round: 250       # number of epochs (equal to the number of trees!)
+    booster: 'gbtree'         # 'gbtree' (default), 'dart' (dropout boosting)
+    tree_method: 'hist'
+    device:      'auto'       # 'auto', 'cpu', 'cuda'
+    
+    learning_rate: 0.1
+    gamma: 1.67
+    max_depth: 5
+    min_child_weight: 1.0
+    max_delta_step: 1
+    subsample: 1
+
+    colsample_bytree:  0.86
+    colsample_bylevel: 0.6
+    colsample_bynode:  0.8
+    
+    reg_lambda: 2.0               # L2 regularization
+    reg_alpha: 0.05               # L1 regularization
+    
+    # learning task parameters
+    #objective: 'binary:logistic'             # Note that 'multi:softprob' does not work with distillation
+    #eval_metric: ['logloss']                 
+    objective: 'custom:binary_cross_entropy'  # Use 'custom:binary_cross_entropy:hessian' for 2nd order descent
+    eval_metric: ['custom']                   # for custom losses, otherwise 'logloss', 'mlogloss' ...
+  
+  # BCE loss domains
+  BCE_param:
+    main:
+      classes: [0, 1]
+      beta: 1.0
+      #set_filter: *MAIN_DOMAIN_FILTER # Comment out for 'inclusive'
+  
+  plot_trees: false
+
+  <<: *EVAL_PARAM

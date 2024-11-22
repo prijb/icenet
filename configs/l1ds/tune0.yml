@@ -56,4 +56,53 @@ genesis_runmode:
   pickle_size: 100000
 
 # ----------------------------------------------------
+train_runmode:
+
+  <<: *MVA_INPUT_PARAM
+
+  maxevents: null
+  modeltag:  null
+
+  tech: &TECH
+    concat_max_pickle: 32           # (technical) [Recursive] concatenation max size, adjust this if encounter problems e.g. with awkward ("127 limit")
+
+  ## Reweighting setup
+  reweight: true
+  reweight_mode: 'write'              # 'write', 'load'
+  reweight_file: null                 # null for automatic, or string for specific
+
+  reweight_param: &REWEIGHT_PARAM
+    equal_frac: True               # Equalize integrated class fractions
+    differential: False
+    reference_class: 0             # Reference class: 0 = (background), 1 = (signal), 2 = (another class) ..., 
+    
+    # Differential param
+    # For example, see /trg/tune0.yml
+
+  ## Outlier protection in the training
+  outlier_param:
+    algo: 'truncate'   # algorithm: 'truncate', null
+    qmin: 0.01         # in [0,100] 
+    qmax: 99.9         # in [0,100]
+    
+    truncate_weights: True # Truncate outlier event weights
+    process_validate: True # Protect also validation sample
+  
+
+  # ** Activate models here **
+  # Give all models some unique identifier and label
+  models: !include configs/l1ds/models.yml
+  active_models: &ACTIVE_MODELS
+    - xgb01
+
+  raytune: !include configs/l1ds/raytune.yml
+
+  batch_train_param:
+    blocksize: 150000   # Maximum number of events simultaneously in RAM
+    epochs: 50          # Number of global epochs (1 epoch = one iteration over the full input dataset), same for all models
+    #num_cpu: null      # Set null for auto, or an integer for manual.
+
+
+
+# ----------------------------------------------------
 plot_param: !include configs/l1ds/plot_param.yml

@@ -36,13 +36,14 @@ def cut_fiducial(X, xcorr_flow=False):
 
     # Jet cuts
     # Create cut strings
+    cut_saturated = np.zeros(N, dtype=bool)
     cut_pt = np.zeros(N, dtype=bool)
     cut_eta = np.zeros(N, dtype=bool)
+    cut_saturated[mask_global] = ak.sum(O.Jet.pt[mask_global] == 1023.5, -1) == 0
     cut_pt[mask_global] = np.logical_and(O.Jet.pt[mask_global, 0] > 30.0, O.Jet.pt[mask_global, 1] > 30.0)
     cut_eta[mask_global] = np.logical_and(np.abs(O.Jet.eta[mask_global, 0]) < 2.5, np.abs(O.Jet.eta[mask_global, 1]) < 2.5)
-
-    names_jet = ['Jet pT cut', 'Jet eta cut']
-    cuts_jet = [cut_pt, cut_eta]
+    names_jet = ['Saturated jet cut', 'Jet pT cut', 'Jet eta cut']
+    cuts_jet = [cut_saturated, cut_pt, cut_eta]
     mask_jet  = stx.apply_cutflow(cut=cuts_jet, names=names_jet, xcorr_flow=xcorr_flow)
 
     return np.logical_and(mask_global, mask_jet)
