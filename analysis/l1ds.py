@@ -11,7 +11,7 @@ from icenet.tools import process
 from icel1ds import common
 
 def main():
-    args, runmode = process.generic_flow(rootname='l1ds', func_loader=common.load_root_file, func_factor=None)
+    args, runmode = process.generic_flow(rootname='l1ds', func_loader=common.load_root_file, func_factor=common.splitfactor)
 
 
 if __name__ == '__main__' :
