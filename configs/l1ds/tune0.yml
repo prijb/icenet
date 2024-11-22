@@ -1,0 +1,24 @@
+# L1DS tune0.yml
+
+rootname: 'l1ds'
+rngseed: 123456                       # Fixed seed for training data mixing
+num_cpus: 1                           # 0 for automatic
+inputvars: 'mvavars'                  # Main file input description python file
+
+
+# ----------------------------------------------------
+genesis_runmode:
+
+  maxevents: null
+  inputmap: 'mc_input.yml'
+  tree_name: null
+
+  filterfunc: null
+  cutfunc: null
+  targetfunc: null
+
+  xcorr_flow: False
+  pickle_size: 100000
+
+# ----------------------------------------------------
+plot_param: !include configs/l1ds/plot_param.yml

@@ -137,6 +137,11 @@ def glob_expand_files(datasets, datapath, recursive_glob=False):
     print("See https://docs.python.org/3/library/glob.html and brace expansion (be careful, do not use [,] brackets in your filenames)")
     print("")
     
+    #Debug
+    print("Datasets input:", datasets)
+    print("Datapath input:", datapath)
+    #Debug stop
+
     # Remove unnecessary []
     if type(datasets) is list and len(datasets) == 1:
         datasets = datasets[0]
@@ -150,6 +155,11 @@ def glob_expand_files(datasets, datapath, recursive_glob=False):
     #print(__name__ + f'.glob_expand_files: After braceexpand: {datasets}')
 
     if (len(datasets) == 1) and ('[' in datasets[0]) and (']' in datasets[0]):
+
+        #Debug
+        print(f"datasets[0]: {datasets[0]}")
+        print("len(datasets) == 1 and [] in datasets[0]")
+        #Debug stop
 
         print(f'Parsing of range [first-last] ...')
 
@@ -173,6 +183,12 @@ def glob_expand_files(datasets, datapath, recursive_glob=False):
 
         datasets = list(braceexpand(datasets[0]))
         #print(__name__ + f'.glob_expand_files: After expanding the range: {datasets}')
+
+        #Debug
+        print("Result datasets:")
+        for data in datasets:
+            print(data)
+        #Debug stop
 
     # Parse input files into a list
     files = list()

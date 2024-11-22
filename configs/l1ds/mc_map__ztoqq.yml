@@ -1,0 +1,29 @@
+input:
+  #class_0:  !include include/QCD_new.yml
+  #class_1:  !include include/scenarioA.yml
+  class_0: 
+    QCD15to7000:
+      path:  'StoreNTuple/L1Scouting/PtRegression/QCD_15to7000'
+      files: 'output_[1-3].root' 
+      xs:   1.0
+      model_param: 
+        mpi:    null 
+        mA:     null 
+        ctau:   null 
+      force_xs: false 
+      isMC:     true 
+      maxevents_scale: 1.0
+  class_1:
+    QCD15to7000:
+      path:  'StoreNTuple/L1Scouting/PtRegression/QCD_15to7000'
+      files: 'output_[5-8].root' 
+      xs:   1.0
+      model_param: 
+        mpi:    null 
+        mA:     null 
+        ctau:   null 
+      force_xs: false 
+      isMC:     true 
+      maxevents_scale: 1.0
+    
+    
