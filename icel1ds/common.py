@@ -277,9 +277,15 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
     io.showmem()
     
     # -------------------------------------------------------------------------
+    # Mutual information regularization targets
+    
+    vars = aux.process_regexp_ids(all_ids=data.ids, ids=inputvars.MI_VARS)
+    data_MI = data[vars].x.astype(np.float32)
+
+    # --------------------------------------------------------------------------
 
     return {'data':        data,
-            'data_MI':     None,
+            'data_MI':     data_MI,
             'data_kin':    data_kin,
             'data_deps':   None,
             'data_tensor': None,

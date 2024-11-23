@@ -38,6 +38,77 @@ MAIN_DOMAIN_FILTER: &MAIN_DOMAIN_FILTER
 
 # -----------------------------------------------
 
+
+# -----------------------------------------------
+# ** Mutual Information Control Domain Filter **
+MI_DOMAIN_FILTER: &MI_DOMAIN_FILTER
+  
+  filter[0]:
+    operator: null  # null (unary), 'cartesian_and', 'cartesian_or'
+    sets: [0]       # input set ids (one or several)
+  
+  # ... more filters here
+  
+  # --------------------
+  
+  set[0]:
+    expand: 'set'  # 'set', 'vetoset' or 'powerset'
+    cutset:
+      # Latex description is for boolean [0,1] per cut
+      - {cut: 'Jet_pt_0 > 0', latex: ['', 'Jet_pt_0 > 0']}
+  
+  #set[0]:
+  #  expand: 'set'   # 'set', 'vetoset' or 'powerset'
+  #  cutset:
+  #    [{cut: '0 < muonSV_mass_0 && muonSV_dxy_0 < 1.0  && muonSV_pAngle_0 < 0.2', latex: ['', '$\Delta_{xy} < 1$ & $\delta < 0.2$']},
+  #     {cut: '0 < muonSV_mass_0 && muonSV_dxy_0 < 1.0  && muonSV_pAngle_0 > 0.2', latex: ['', '$\Delta_{xy} < 1$ & $\delta > 0.2$']},
+  #     {cut: '0 < muonSV_mass_0 && 1.0  < muonSV_dxy_0 && muonSV_dxy_0 < 10 && muonSV_pAngle_0 < 0.2', latex: ['', '$1 < \Delta_{xy} < 10$ & $\delta < 0.2$']},
+  #     {cut: '0 < muonSV_mass_0 && 1.0  < muonSV_dxy_0 && muonSV_dxy_0 < 10 && muonSV_pAngle_0 > 0.2', latex: ['', '$1 < \Delta_{xy} < 10$ & $\delta > 0.2$']},
+  #     {cut: '0 < muonSV_mass_0 && muonSV_dxy_0 > 10.0 && muonSV_pAngle_0 < 0.2', latex: ['', '$\Delta_{xy} > 10$ & $\delta < 0.2$']},
+  #     {cut: '0 < muonSV_mass_0 && muonSV_dxy_0 > 10.0 && muonSV_pAngle_0 > 0.2', latex: ['', '$\Delta_{xy} > 10$ & $\delta > 0.2$']}
+  #    ]
+# -----------------------------------------------
+
+
+# -----------------------------------------------
+# ** Mutual Information regularization **
+MI_REG_PARAM: &MI_REG_PARAM
+  
+  classes: [0,-2]          #  Which classes to use in the regularization
+  
+  losstype: 'DCORR'        # 'MINE', 'MINE_EMA', 'DENSITY', 'DCORR', 'PEARSON' (use PEARSON only for debug)
+  min_count: 32            #  Minimum number of events (per category)
+  max_N: 5000              #  Maximum number of events per function call (use to limit sample size for DCORR)
+  min_score: 0.6           #  Consider only events with MVA output [0,1] larger than this value (null for None)
+  poisson_weight: False    #  Per category Poisson sqrt(N) weighted loss
+  
+  # ------------------
+  # Neural MI param
+
+  eval_batch_size: 8192    #  Evaluation batch size (pure memory <-> time tradeoff)
+  alpha:  0.01             #  Exponential Moving Average (EMA) coupling parameter
+  ma_eT:  [null, null]     #  EMA tracking values (set for each class!)
+  
+  y_dim: [1]               #  dimensionality ([1] for NN scalar output Z vs target X)
+  
+  epochs: 5
+  batch_size: 256          #  if the estimate (network) turns into NaN, try tuning batch size, lr, weight decay ...
+  lr: 1.0e-4
+  weight_decay: 1.0e-2
+  clip_norm: 1.0
+  
+  mlp_dim: [128, 128]
+  batch_norm: False
+  dropout: 0.01
+  noise_std: 0.025
+  activation: 'relu'
+  
+  # -------------------------
+  
+  # Comment out for no categories (N.B. dependence structure over inclusive sample != categorical)
+  set_filter: *MI_DOMAIN_FILTER
+# -----------------------------------------------
+
 # ========================================================================
 ## Classifier setup
 # ========================================================================
@@ -98,7 +169,7 @@ xgb01: &XGB01
     colsample_bylevel: 0.6
     colsample_bynode:  0.8
     
-    reg_lambda: 0.3               # L2 regularization
+    reg_lambda: 2.0               # L2 regularization
     reg_alpha: 0.05               # L1 regularization
     
     # learning task parameters
@@ -119,18 +190,18 @@ iceboost01: &ICEBOOST01
   label:   'ICEBOOST'
   raytune:  xgb_trial_0
 
-  exclude_MVA_vars: ['muonSV_mass.*', 'SV_mass.*', 'Jet_mass.*']
+  exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
   #include_MVA_vars: ['.*']
   
   # general parameters
   model_param:
-    num_boost_round: 250       # number of epochs (equal to the number of trees!)
+    num_boost_round: 200       # number of epochs (equal to the number of trees!)
     booster: 'gbtree'         # 'gbtree' (default), 'dart' (dropout boosting)
     tree_method: 'hist'
     device:      'auto'       # 'auto', 'cpu', 'cuda'
     
-    learning_rate: 0.1
-    gamma: 1.67
+    learning_rate: 3e-2
+    gamma: 0.5
     max_depth: 5
     min_child_weight: 1.0
     max_delta_step: 1
@@ -159,3 +230,18 @@ iceboost01: &ICEBOOST01
   plot_trees: false
 
   <<: *EVAL_PARAM
+
+# ICEBOOST with MI-regularization
+#
+iceboost01-MI:
+
+  <<: *ICEBOOST01
+
+  label:   'ICEBOOST-MI'
+
+  exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
+  #include_MVA_vars: ['.*']
+  
+  MI_param:
+    beta: [0.1, 0.1]         # Positive for minimizing (per class in use)
+    <<: *MI_REG_PARAM
