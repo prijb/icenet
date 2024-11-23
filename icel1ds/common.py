@@ -218,6 +218,38 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
     jagged_vars = aux.process_regexp_ids(all_ids=aux.unroll_ak_fields(x=x, order='second'), ids=eval('inputvars.' + args['inputvar_jagged']))
 
     # -------------------------------------------------------------------------
+    ## Add custom variables (these are scalar)
+    """
+    Variables:
+    m_j1j2 
+    pt_j1j2
+    dEta_j1j2
+    dPhi_j1j2
+    """
+    print(f"Adding custom dijet variables ...")
+
+    dijet_m = analytic.diobj_mass(x=data.x['Jet'], pt='pt', eta='eta', phi='phi')
+    dijet_pt = analytic.diobj_pt(x=data.x['Jet'], pt='pt', eta='eta', phi='phi')
+    dijet_deta = analytic.diobj_dEta(x=data.x['Jet'], eta='eta')
+    dijet_dphi = analytic.diobj_dPhi(x=data.x['Jet'], phi='phi')
+    
+    #print("Debug: dijet_m")
+    #print(dijet_m)
+
+    data.x['dijet_m'] = dijet_m
+    data.x['dijet_pt'] = dijet_pt
+    data.x['dijet_deta'] = dijet_deta
+    data.x['dijet_dphi'] = dijet_dphi
+
+    scalar_vars.append('dijet_m')
+    scalar_vars.append('dijet_pt')
+    scalar_vars.append('dijet_deta')
+    scalar_vars.append('dijet_dphi')
+
+    print(f"Scalar vars = {scalar_vars}", 'yellow')
+
+
+    # -------------------------------------------------------------------------
     ### Pick kinematic variables out
     data_kin = None
     

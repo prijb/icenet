@@ -54,6 +54,41 @@ def deltaR(x, eta1: str, eta2: str, phi1: str, phi2: str):
     
     return np.sqrt(deltaEta**2 + deltaPhi**2)
 
+#Versions of pt, invariant mass, dEta and dPhi only for the leading two objects (assume massless)
+def diobj_pt(x, pt: str, eta: str, phi: str):
+    """
+    Di-object pT for only the leading two objects
+    """
+    px1,py1,pz1 = x[pt][:, 0]*np.cos(x[phi][:, 0]), x[pt][:, 0]*np.sin(x[phi][:, 0]), x[pt][:, 0]*np.sinh(x[eta][:, 0])
+    px2,py2,pz2 = x[pt][:, 1]*np.cos(x[phi][:, 1]), x[pt][:, 1]*np.sin(x[phi][:, 1]), x[pt][:, 1]*np.sinh(x[eta][:, 1])
+
+    return np.sqrt((px1 + px2)**2 + (py1 + py2)**2)
+
+def diobj_mass(x, pt: str, eta: str, phi: str):
+    """
+    Di-object invariant mass for only the leading two objects
+    """
+    px1,py1,pz1 = x[pt][:, 0]*np.cos(x[phi][:, 0]), x[pt][:, 0]*np.sin(x[phi][:, 0]), x[pt][:, 0]*np.sinh(x[eta][:, 0])
+    px2,py2,pz2 = x[pt][:, 1]*np.cos(x[phi][:, 1]), x[pt][:, 1]*np.sin(x[phi][:, 1]), x[pt][:, 1]*np.sinh(x[eta][:, 1])
+    
+    E1 = np.sqrt(px1**2 + py1**2 + pz1**2)
+    E2 = np.sqrt(px2**2 + py2**2 + pz2**2)
+    M2 = 2*(E1*E2 - (px1*px2 + py1*py2 + pz1*pz2))
+
+    return np.sqrt(M2)
+
+def diobj_dEta(x, eta: str):
+    """
+    Di-object delta eta for only the leading two objects
+    """
+    return np.abs(x[eta][:, 0] - x[eta][:, 1])
+
+def diobj_dPhi(x, phi: str):
+    """
+    Di-object delta phi for only the leading two objects
+    """
+    return phi_phasewrap(x[phi][:, 0] - x[phi][:, 1])
+
 
 def fox_wolfram_boost_inv(p, L=10):
     """
