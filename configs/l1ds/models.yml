@@ -75,7 +75,8 @@ xgb01: &XGB01
   raytune:  xgb_trial_0
   
   #exclude_MVA_vars: null
-  exclude_MVA_vars: ['dijet_m']
+  #exclude_MVA_vars: ['dijet_m']
+  exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
   #exclude_MVA_vars: ['Jet_eta.*']
   #include_MVA_vars: ['.*']
   

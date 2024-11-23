@@ -18,7 +18,7 @@ DATAPATH="/home/pb4918/Physics/Projects/L1Scouting/Icenet/TestStash"
 
 MAX=10000000 
 
-python analysis/l1ds.py --runmode genesis --maxevents $MAX --inputmap mc_map__ztoqq_local.yml --config $CONFIG --datapath $DATAPATH --use_cache 1
+python analysis/l1ds.py --runmode genesis --maxevents $MAX --inputmap mc_map__ztoqq_local.yml --config $CONFIG --datapath $DATAPATH --use_cache 0
 python analysis/l1ds.py --runmode train --maxevents $MAX --inputmap mc_map__ztoqq_local.yml --modeltag ztoqq_local --config $CONFIG --datapath $DATAPATH 
 python analysis/l1ds.py --runmode eval --maxevents $MAX --inputmap mc_map__ztoqq_local.yml --modeltag ztoqq_local --config $CONFIG --datapath $DATAPATH 
 

@@ -87,7 +87,7 @@ def diobj_dPhi(x, phi: str):
     """
     Di-object delta phi for only the leading two objects
     """
-    return phi_phasewrap(x[phi][:, 0] - x[phi][:, 1])
+    return np.abs(phi_phasewrap(x[phi][:, 0] - x[phi][:, 1]))
 
 
 def fox_wolfram_boost_inv(p, L=10):
