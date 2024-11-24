@@ -350,10 +350,10 @@ def load_tree(rootfile, tree, entry_start=0, entry_stop=None, maxevents=None,
             # ======================================================
             # Multiprocessing version for multiple files
             
-            #ray.init(num_cpus=num_workers, _temp_dir=f'{os.getcwd()}/tmp/')
+            ray.init(num_cpus=num_workers, _temp_dir=f'{os.getcwd()}/tmp/')
 
             #Using a different temp dir for ray (bypass UNIX byte size issue)
-            ray.init(num_cpus=num_workers, _temp_dir=f'/home/pb4918/tmp/')
+            #ray.init(num_cpus=num_workers, _temp_dir=f'/home/pb4918/tmp/')
 
             chunk_ind    = aux.split_start_end(range(len(files)), num_workers)
             submaxevents = aux.split_size(range(maxevents), num_workers)
@@ -417,8 +417,8 @@ def load_tree(rootfile, tree, entry_start=0, entry_stop=None, maxevents=None,
             # ======================================================
             # Multiprocessing version for multiple files
             
-            #ray.init(num_cpus=num_workers, _temp_dir=f'{os.getcwd()}/tmp/')
-            ray.init(num_cpus=num_workers, _temp_dir=f'/home/pb4918/tmp/')
+            ray.init(num_cpus=num_workers, _temp_dir=f'{os.getcwd()}/tmp/')
+            #ray.init(num_cpus=num_workers, _temp_dir=f'/home/pb4918/tmp/')
 
             chunk_ind    = aux.split_start_end(range(len(files)), num_workers)
             submaxevents = aux.split_size(range(maxevents), num_workers)

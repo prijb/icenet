@@ -5,10 +5,10 @@
 # Use * or other glob wildcards for filenames
 #
 # Run with: source tests/runme.sh
-
+eval "$(/vols/cms/pb4918/miniforge3/bin/conda shell.bash hook)"
 conda activate icenet
 
-ICEPATH="/home/pb4918/Physics/Projects/L1Scouting/Icenet/icenet"
+ICEPATH="/vols/cms/pb4918/icenet_l1ds/icenet"
 cd $ICEPATH
 echo "$(pwd)"
 source $ICEPATH/setenv.sh
