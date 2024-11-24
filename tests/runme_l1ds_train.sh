@@ -10,7 +10,7 @@ echo "$(pwd)"
 source $ICEPATH/setenv.sh
 
 #Setting a temporary RAY DIR for local debugging
-export RAY_TMPDIR=/home/pb4918/tmp
+#export RAY_TMPDIR=/home/pb4918/tmp
 
 CONFIG="tune0.yml"
 #DATAPATH="/vols/cms/pb4918"
