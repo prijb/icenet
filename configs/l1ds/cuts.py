@@ -47,3 +47,25 @@ def cut_fiducial(X, xcorr_flow=False):
     mask_jet  = stx.apply_cutflow(cut=cuts_jet, names=names_jet, xcorr_flow=xcorr_flow)
 
     return np.logical_and(mask_global, mask_jet)
+
+#This cut is for dijet variables (aka after the analytical function produces them)
+def cut_dijet(X, xcorr_flow=False):
+    """ Basic fiducial (kinematic) selections.
+    
+    Args:
+        X:          Awkward jagged array
+        xcorr_flow: cut N-point cross-correlations
+    
+    Returns:
+        Passing indices mask (N)
+    """
+    global O; O = X  # __technical__ recast due to eval() scope
+    
+    N = len(O)
+
+    # Global cut on dijet m
+    names_global = ['np.logical_and(O.dijet_m > 150, O.dijet_m < 700)']
+    cuts_global = [eval(name, globals()) for name in names_global]
+    mask_global = stx.apply_cutflow(cut=cuts_global, names=names_global, xcorr_flow=xcorr_flow)
+
+    return mask_global

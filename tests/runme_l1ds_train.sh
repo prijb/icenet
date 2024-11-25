@@ -15,7 +15,7 @@ DATAPATH="/vols/cms/pb4918/StoreNTuple/L1Scouting/Icenet"
 
 MAX=10000000 
 
-python analysis/l1ds.py --runmode genesis --num_cpus 1 --maxevents $MAX --inputmap mc_map__ztoqq.yml --config $CONFIG --datapath $DATAPATH --use_cache 0
+python analysis/l1ds.py --runmode genesis --num_cpus 1 --maxevents $MAX --inputmap mc_map__ztoqq.yml --config $CONFIG --datapath $DATAPATH --use_cache 1
 python analysis/l1ds.py --runmode train --num_cpus 1 --maxevents $MAX --inputmap mc_map__ztoqq.yml --modeltag ztoqq --config $CONFIG --datapath $DATAPATH 
 python analysis/l1ds.py --runmode eval --num_cpus 1 --maxevents $MAX --inputmap mc_map__ztoqq.yml --modeltag ztoqq --config $CONFIG --datapath $DATAPATH 
 

@@ -140,11 +140,6 @@ def process_root(X, args, ids=None, isMC=None, return_mask=False, class_id=None,
     FILTERFUNC = globals()[args['filterfunc']]    
     CUTFUNC    = globals()[args['cutfunc']]
 
-    #Debug
-    #print(f"FILTERFUNC: {FILTERFUNC}")
-    #print(f"CUTFUNC: {CUTFUNC}")
-    #Debug stop
-
 
     stats = {'filterfunc': None, 'cutfunc': None}
 
@@ -167,19 +162,21 @@ def process_root(X, args, ids=None, isMC=None, return_mask=False, class_id=None,
 
     X_final = X_new[cmask]
 
-    #Debug
-    #print(f"nJet before cuts: {X.nJet[:10].to_list()}")
-    #print(f"Jet pT before cuts: {X.Jet.pt[:10].to_list()}")
-    #print(f"Jet eta before cuts: {X.Jet.eta[:10].to_list()}")
-    #print("")
-    #print(f"nJet after cuts: {X_final.nJet[:10].to_list()}")
-    #print(f"X pT after cuts: {X_final.Jet.pt[:10].to_list()}")
-    #print(f"X eta after cuts: {X_final.Jet.eta[:10].to_list()}")
-    #Debug stop
+    # Add dijet variables after cuts
+    print(f"Adding custom dijet variables ...")
+    X_final['dijet_m'] = analytic.diobj_mass(x=X_final['Jet'], pt='pt', eta='eta', phi='phi')
+    X_final['dijet_pt'] = analytic.diobj_pt(x=X_final['Jet'], pt='pt', eta='eta', phi='phi')
+    X_final['dijet_deta'] = analytic.diobj_dEta(x=X_final['Jet'], eta='eta')
+    X_final['dijet_dphi'] = analytic.diobj_dPhi(x=X_final['Jet'], phi='phi')
 
-    #Pass through
-    #X_final = copy.deepcopy(X)
-    #ids = copy.deepcopy(ids)
+    # Secondary cut on dijet variables (restricting mass to 150-700 range)
+    CUTFUNC_SECONDARY = globals()['cut_dijet']
+    print(f"Applying custom dijet cuts ...")
+    cmask_secondary = CUTFUNC_SECONDARY(X=X_final, xcorr_flow=args['xcorr_flow'])
+    stats['cutfunc_secondary'] = {'before': len(X_final), 'after': sum(cmask_secondary)}
+    print(f"isMC = {isMC} | <cutfunc_secondary> before: {len(X_final)}, after: {sum(cmask_secondary)} events ({sum(cmask_secondary)/(len(X_final)+1E-12):0.6f}) \n", 'green')
+
+    X_final = X_final[cmask_secondary]
 
     if return_mask == False:
         return X_final, ids, stats
@@ -226,27 +223,36 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
     dEta_j1j2
     dPhi_j1j2
     """
-    print(f"Adding custom dijet variables ...")
+    #print(f"Adding custom dijet variables ...")
+    #dijet_m = analytic.diobj_mass(x=data.x['Jet'], pt='pt', eta='eta', phi='phi')
+    #dijet_pt = analytic.diobj_pt(x=data.x['Jet'], pt='pt', eta='eta', phi='phi')
+    #dijet_deta = analytic.diobj_dEta(x=data.x['Jet'], eta='eta')
+    #dijet_dphi = analytic.diobj_dPhi(x=data.x['Jet'], phi='phi')
 
-    dijet_m = analytic.diobj_mass(x=data.x['Jet'], pt='pt', eta='eta', phi='phi')
-    dijet_pt = analytic.diobj_pt(x=data.x['Jet'], pt='pt', eta='eta', phi='phi')
-    dijet_deta = analytic.diobj_dEta(x=data.x['Jet'], eta='eta')
-    dijet_dphi = analytic.diobj_dPhi(x=data.x['Jet'], phi='phi')
-    
-    #print("Debug: dijet_m")
-    #print(dijet_m)
+    #data.x['dijet_m'] = dijet_m
+    #data.x['dijet_pt'] = dijet_pt
+    #data.x['dijet_deta'] = dijet_deta
+    #data.x['dijet_dphi'] = dijet_dphi
 
-    data.x['dijet_m'] = dijet_m
-    data.x['dijet_pt'] = dijet_pt
-    data.x['dijet_deta'] = dijet_deta
-    data.x['dijet_dphi'] = dijet_dphi
-
+    #List out the var
     scalar_vars.append('dijet_m')
     scalar_vars.append('dijet_pt')
     scalar_vars.append('dijet_deta')
     scalar_vars.append('dijet_dphi')
 
     print(f"Scalar vars = {scalar_vars}", 'yellow')
+
+    #Now apply cuts on the custom variables
+    #print(f"Applying custom dijet cuts ...")
+    #num_before = len(data.x)
+    #cut_dijet = np.logical_and(dijet_m > 150.0, dijet_m < 700.0)
+    #data.x = data.x[cut_dijet]
+    #data.y = data.y[cut_dijet]
+    #data.w = data.w[cut_dijet]
+    #num_after = len(data.x)
+    #print(f"Before: {num_before}, After: {num_after}, Cut efficiency: {num_after/num_before:.2f}", 'yellow')
+
+
 
 
     # -------------------------------------------------------------------------
