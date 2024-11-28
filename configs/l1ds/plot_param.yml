@@ -75,15 +75,53 @@ MVA_output:
 
 ## (MVA output x External variable) density (2D)
 MVA_2D:
-  active: False
+  active: True
 
   plot[0]:
     #var:  ['.*'] # RegExp supported
     #var:  ['muonSV_mass.*'] # RegExp supported
-    var:   ['muonSV_mass_0', 'muonSV_mass_1']
+    #var:   ['muonSV_mass_0', 'muonSV_mass_1']
+    var: ['dijet_deta']
     edges: [{'nbin': 50,  'minmax': [0.0, 1.0],  'space': 'linear'},
-            {'nbin': 100, 'minmax': [0.0, 20.0], 'space': 'linear'}]
+      {'nbin': 50, 'minmax': [0.0, 4.5], 'space': 'linear'}
+      ]
     density: True
+
+  plot[1]:
+    var: ['dijet_m']
+    edges: [{'nbin': 50,  'minmax': [0.0, 1.0],  'space': 'linear'},
+      {'nbin': 50, 'minmax': [150.0, 700.0], 'space': 'linear'}
+      ]
+    density: True
+
+  plot[2]:
+    var: ['dijet_pt']
+    edges: [{'nbin': 50,  'minmax': [0.0, 1.0],  'space': 'linear'},
+      {'nbin': 50, 'minmax': [0.0, 150.0], 'space': 'linear'}
+      ]
+    density: True
+  
+  plot[3]:
+    var: ['Jet_pt.*']
+    edges: [{'nbin': 50,  'minmax': [0.0, 1.0],  'space': 'linear'},
+      {'nbin': 50, 'minmax': [0.0, 200.0], 'space': 'linear'}
+      ]
+    density: True
+
+  plot[4]:
+    var: ['Jet_eta.*']
+    edges: [{'nbin': 50,  'minmax': [0.0, 1.0],  'space': 'linear'},
+      {'nbin': 50, 'minmax': [-2.5, 2.5], 'space': 'linear'}
+      ]
+    density: True
+  
+  plot[5]:
+    var: ['nJet']
+    edges: [{'nbin': 50,  'minmax': [0.0, 1.0],  'space': 'linear'},
+      {'nbin': 8, 'minmax': [2.0, 10.0], 'space': 'linear'}
+      ]
+    density: True
+  
   
   #plot[1]:
   #  var:   ['.?hlt_pms2.?'] # RegExp supported

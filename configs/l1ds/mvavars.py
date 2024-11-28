@@ -46,7 +46,15 @@ LOAD_VARS += MVA_SCALAR_VARS
 LOAD_VARS += MVA_JAGGED_VARS
 
 #Mutual information regularization targets
+#MI_VARS = [
+#    'dijet_m'
+#]
+
+#MI_VARS = [
+#    'dijet_deta'
+#]
+
 MI_VARS = [
-    #'dijet_deta',
+    'dijet_deta',
     'dijet_m'
 ]
