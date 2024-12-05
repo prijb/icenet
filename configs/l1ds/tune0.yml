@@ -94,8 +94,9 @@ train_runmode:
   models: !include configs/l1ds/models.yml
   active_models: &ACTIVE_MODELS
     - xgb01
-    #- iceboost01
-    #- iceboost01-MI
+    - iceboost01
+    - iceboost01-MI
+    - cut0
 
   raytune: !include configs/l1ds/raytune.yml
 

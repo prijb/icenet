@@ -74,12 +74,15 @@ MI_DOMAIN_FILTER: &MI_DOMAIN_FILTER
 # ** Mutual Information regularization **
 MI_REG_PARAM: &MI_REG_PARAM
   
-  classes: [0,-2]          #  Which classes to use in the regularization
+  #classes: [0,-2]          #  Which classes to use in the regularization
+  classes: [0]
+  #classes: [0, 1]
   
   losstype: 'DCORR'        # 'MINE', 'MINE_EMA', 'DENSITY', 'DCORR', 'PEARSON' (use PEARSON only for debug)
   min_count: 32            #  Minimum number of events (per category)
   max_N: 5000              #  Maximum number of events per function call (use to limit sample size for DCORR)
-  min_score: 0.6           #  Consider only events with MVA output [0,1] larger than this value (null for None)
+  #min_score: 0.6           #  Consider only events with MVA output [0,1] larger than this value (null for None)
+  min_score: null
   poisson_weight: False    #  Per category Poisson sqrt(N) weighted loss
   
   # ------------------
@@ -129,9 +132,9 @@ cutset0:
 cut0:
   train:  'cut'
   predict: 'cut'
-  label:  'Jet_pt'
-  variable: 'Jet_pt'
-  sign: 1
+  label:  'dijet_deta'
+  variable: 'dijet_deta'
+  sign: -1
   transform: null
 
 # ------------------------------------------------------------------------------------------
@@ -147,7 +150,9 @@ xgb01: &XGB01
   
   #exclude_MVA_vars: null
   #exclude_MVA_vars: ['dijet_m']
-  exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
+  #exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
+  #exclude_MVA_vars: ['dijet_deta', 'dijet_m', "Jet_pt.*"]
+  exclude_MVA_vars: ['dijet_m', 'dijet_deta']
   #exclude_MVA_vars: ['Jet_eta.*']
   #include_MVA_vars: ['.*']
   
@@ -190,7 +195,10 @@ iceboost01: &ICEBOOST01
   label:   'ICEBOOST'
   raytune:  xgb_trial_0
 
-  exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
+  #exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
+  #exclude_MVA_vars: ['dijet_deta', 'dijet_m', "Jet_pt.*"]
+  exclude_MVA_vars: ['dijet_m', 'dijet_deta']
+  #exclude_MVA_vars: ['dijet_m']
   #include_MVA_vars: ['.*']
   
   # general parameters
@@ -239,9 +247,13 @@ iceboost01-MI:
 
   label:   'ICEBOOST-MI'
 
-  exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
+  #exclude_MVA_vars: ['dijet_m', "Jet_pt.*"]
+  #exclude_MVA_vars: ['dijet_m']
+  #exclude_MVA_vars: ['dijet_deta', 'dijet_m', "Jet_pt.*"]
+  exclude_MVA_vars: ['dijet_m', 'dijet_deta']
   #include_MVA_vars: ['.*']
   
   MI_param:
     beta: [0.1, 0.1]         # Positive for minimizing (per class in use)
+    #beta: [1.0, 1.0]
     <<: *MI_REG_PARAM
