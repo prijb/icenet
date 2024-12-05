@@ -1,0 +1,23 @@
+input:
+  class_0: 
+    QCD15to7000:
+      path:  'QCD_15to7000_withtowers'
+      files: 'nano_[1-50].root' 
+      xs:   1.0
+      model_param: 
+        mZ:    null
+      force_xs: false 
+      isMC:     true 
+      maxevents_scale: 1.0
+  class_1:
+    ZtoQQ50:
+      path: 'ztoqq_50_withtowers'
+      files: 'nano_[1-50].root'
+      xs: 1.0
+      model_param:
+        mZ: 50.0
+      force_xs: false
+      isMC: true
+      maxevents_scale: 1.0
+
+    

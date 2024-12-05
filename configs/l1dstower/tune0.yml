@@ -1,0 +1,147 @@
+# L1DS tune0.yml
+
+rootname: 'l1dstower'
+rngseed: 123456                       # Fixed seed for training data mixing
+num_cpus: 1                           # 0 for automatic
+inputvars: 'mvavars'                  # Main file input description python file
+
+# ----------------------------------------------------
+mva_param: &MVA_INPUT_PARAM
+  use_conditional: false              # Conditional (theory parametric) input
+
+  primary_classes: [0,1]              # Primary class IDs in MVA (train, ROC etc.)
+  signal_class: 1                     # Signal class ID
+  DA_class:    -2                     # Domain Adaptation class
+  
+  inputvar_scalar: 'MVA_SCALAR_VARS'  # Input variables, implemented under mvavars.py
+  inputvar_jagged: 'MVA_JAGGED_VARS'
+  
+  # For xgboost etc. fixed input dimension models
+  # The variable names below need to match the nanoAOD variable names, e.g. 'Jet_*'
+  jagged_maxdim:
+    
+    L1Jet:  4
+    L1EmulCaloTower: 10
+
+  # Filtering of collection entries (for BDT)
+  jagged_filter:
+    
+    - name: 'L1Jet'
+      condition: 'L1Jet.pt > 0'
+
+  #Ordering collections
+  jagged_order:
+
+    - name: 'L1EmulCaloTower'
+      var: 'iet'
+      ascending: False
+
+  frac: [0.6, 0.1, 0.3]  
+
+  # Variable imputation
+  imputation_param:
+    active: true                     # True / False
+    var: null                        # Array of variables to be imputated, if null, then all
+    algorithm: 'constant'            # Algorithm type: 'constant', iterative' (vector), knn' (vector), 'mean' (scalar), 'median' (scalar)
+    fill_value: -999.0               # For constant imputation
+    knn_k: 8                         # Number of nearest neighbours considered
+    values: null 
+  
+  varnorm: null                     # Variable normalization, null for no normalization
+
+# ----------------------------------------------------
+genesis_runmode:
+
+  maxevents: null
+  inputmap: 'mc_input.yml'
+  tree_name: null
+
+  filterfunc: 'filter_nofilter'
+  #cutfunc: 'cut_fiducial'
+  cutfunc: 'cut_nocut'
+  targetfunc: null
+
+  xcorr_flow: False
+  pickle_size: 100000
+
+# ----------------------------------------------------
+train_runmode:
+
+  <<: *MVA_INPUT_PARAM
+
+  maxevents: null
+  modeltag:  null
+
+  tech: &TECH
+    concat_max_pickle: 32           # (technical) [Recursive] concatenation max size, adjust this if encounter problems e.g. with awkward ("127 limit")
+
+  ## Reweighting setup
+  reweight: true
+  reweight_mode: 'write'              # 'write', 'load'
+  reweight_file: null                 # null for automatic, or string for specific
+
+  reweight_param: &REWEIGHT_PARAM
+    equal_frac: True               # Equalize integrated class fractions
+    differential: False
+    reference_class: 0             # Reference class: 0 = (background), 1 = (signal), 2 = (another class) ..., 
+    
+    # Differential param
+    # For example, see /trg/tune0.yml
+
+  ## Outlier protection in the training
+  outlier_param:
+    algo: 'truncate'   # algorithm: 'truncate', null
+    qmin: 0.01         # in [0,100] 
+    qmax: 99.9         # in [0,100]
+    
+    truncate_weights: True # Truncate outlier event weights
+    process_validate: True # Protect also validation sample
+  
+
+  # ** Activate models here **
+  # Give all models some unique identifier and label
+  models: !include configs/l1dstower/models.yml
+  active_models: &ACTIVE_MODELS
+    - xgb01
+    - xgb01_onlyl1jet
+    #- iceboost01
+    #- iceboost01-MI
+    #- cutset0
+    #- cut0
+
+  raytune: !include configs/l1dstower/raytune.yml
+
+  batch_train_param:
+    blocksize: 150000   # Maximum number of events simultaneously in RAM
+    epochs: 50          # Number of global epochs (1 epoch = one iteration over the full input dataset), same for all models
+    #num_cpu: null      # Set null for auto, or an integer for manual.
+
+# ----------------------------------------------------
+eval_runmode:
+  
+  <<: *MVA_INPUT_PARAM
+
+  maxevents: null
+  modeltag:  null
+  
+  tech: *TECH
+  
+  # Conditional (theory parametric) dequantization
+  conditional_param:
+    dequantize_common: False           # Under common.py
+    n_interp:   1000                  # Number of interpolation points per dimension
+    kind:       'quadratic'              # Interpolator ('linear', 'quadratic', 'cubic' ...),
+                                      # see scipy.interpolate.interp1d
+  
+  reweight: true
+  reweight_mode: 'load'               # 'write', 'load'
+  reweight_file: null                 # null for automatic, or string for specific
+  
+  reweight_param: *REWEIGHT_PARAM
+
+  models:  !include configs/l1dstower/models.yml
+  active_models: *ACTIVE_MODELS
+
+
+# ----------------------------------------------------
+plot_param: !include configs/l1dstower/plot_param.yml
