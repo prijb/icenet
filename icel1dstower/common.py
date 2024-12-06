@@ -205,7 +205,28 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
     ### Pick activate variables out
     scalar_vars = aux.process_regexp_ids(all_ids=aux.unroll_ak_fields(x=x, order='first'),  ids=eval('inputvars.' + args['inputvar_scalar']))
     jagged_vars = aux.process_regexp_ids(all_ids=aux.unroll_ak_fields(x=x, order='second'), ids=eval('inputvars.' + args['inputvar_jagged']))
+    
+    # -------------------------------------------------------------------------
+    ## ** Collection filter **
+    
+    for d in args['jagged_filter']:
+        
+        expr = 'data.x.' + d['condition'].strip() # strip to remove leading/trailing spaces
+        print(f'Filtering collection {d} with {expr}', 'yellow')
+        
+        filter_ind = eval(expr)
+        data.x[d['name']] = data.x[d['name']][filter_ind]
+    
+    # -------------------------------------------------------------------------
+    ## ** Collection entry re-ordering sort **
+    
+    for d in args['jagged_order']:
 
+        print(f'Collection re-ordering {d}', 'yellow')
+        
+        sort_ind = ak.argsort(data.x[d['name']][d['var']], ascending=d['ascending'])
+        data.x[d['name']] = data.x[d['name']][sort_ind]
+        
     # -------------------------------------------------------------------------
     ## Add custom variables (these are scalar)
     """
@@ -231,6 +252,15 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
     #scalar_vars.append('dijet_pt')
     #scalar_vars.append('dijet_deta')
     #scalar_vars.append('dijet_dphi')
+
+    print(f"Adding sphericity...")
+    tower_sphericity = analytic.sphericity(x=data.x['L1EmulCaloTower'], pt='iet', eta='ieta', phi='iphi')
+
+    print("Sphericity")
+    print(tower_sphericity)
+    
+    data.x['L1EmulCaloTower_sphericity'] = tower_sphericity
+    scalar_vars.append('L1EmulCaloTower_sphericity')
 
     print(f"Scalar vars = {scalar_vars}", 'yellow')
 

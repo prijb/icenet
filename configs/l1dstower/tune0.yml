@@ -28,6 +28,8 @@ mva_param: &MVA_INPUT_PARAM
     
     - name: 'L1Jet'
       condition: 'L1Jet.pt > 0'
+    - name: 'L1EmulCaloTower'
+      condition: 'L1EmulCaloTower.iet < 508'
 
   #Ordering collections
   jagged_order:
@@ -58,7 +60,8 @@ genesis_runmode:
 
   filterfunc: 'filter_nofilter'
   #cutfunc: 'cut_fiducial'
-  cutfunc: 'cut_nocut'
+  #cutfunc: 'cut_nocut'
+  cutfunc: 'cut_tower'
   targetfunc: null
 
   xcorr_flow: False

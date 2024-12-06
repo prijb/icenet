@@ -3,6 +3,7 @@
 # m.mieskolainen@imperial.ac.uk, 2024
 
 import numpy as np
+import awkward as ak
 import numba
 from scipy import special as special
 
@@ -88,6 +89,78 @@ def diobj_dPhi(x, phi: str):
     Di-object delta phi for only the leading two objects
     """
     return np.abs(phi_phasewrap(x[phi][:, 0] - x[phi][:, 1]))
+
+def get_sphericity(m):
+    """
+    Matrix is 3x3
+
+    Returns lambda2 + lambda3
+    """
+    vals = np.linalg.eigvals(m)
+    vals = np.sort(vals)[::-1]
+    return 1.5*(vals[1] + vals[2])
+
+
+#Event sphericity
+def sphericity(x, pt: str, eta: str, phi: str):
+    """
+    Event sphericity
+    """
+    #print("\nBefore conversion")
+    #print("pT")
+    #print(x[pt])
+    #print("eta")
+    #print(x[eta])
+    #print("phi")
+    #print(x[phi])
+
+    #Convert from hardware
+    x[pt] = x[pt]*0.5
+    x[eta] = x[eta]*0.0435
+    x[phi] = x[phi]*0.0435
+    #Confine to [-pi, pi]
+    x[phi] = phi_phasewrap(x[phi])
+
+    print("\nAfter conversion")
+    print("pT")
+    print(x[pt])
+    print("eta")
+    print(x[eta])
+    print("phi")
+    print(x[phi])
+
+    px = x[pt] * np.cos(x[phi])
+    py = x[pt] * np.sin(x[phi])
+    pz = x[pt] * np.sinh(x[eta])
+
+    #Sums for sphericity
+    Sxx = ak.sum(px*px, axis=-1)
+    Syy = ak.sum(py*py, axis=-1)
+    Szz = ak.sum(pz*pz, axis=-1)
+
+    Sxy = ak.sum(px*py, axis=-1)
+    Sxz = ak.sum(px*pz, axis=-1)
+    Syz = ak.sum(py*pz, axis=-1)
+
+    #Normalisation
+    Spp = Sxx + Syy + Szz
+
+    #Non-vectorised loops :( , but that's what I'm doing for now bc of this matrix business
+    sphericities = []
+    for i in range(len(Spp)):
+        if Spp[i] == 0:
+            sphericities.append(0)
+            continue
+        
+        S_matrix = np.array([[Sxx[i], Sxy[i], Sxz[i]],
+                         [Sxy[i], Syy[i], Syz[i]],
+                         [Sxz[i], Syz[i], Szz[i]]]) / Spp[i]
+        sphericities.append(get_sphericity(S_matrix))
+
+    sphericities = ak.Array(sphericities)
+
+    return sphericities
+
 
 
 def fox_wolfram_boost_inv(p, L=10):
