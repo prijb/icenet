@@ -253,14 +253,22 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
     #scalar_vars.append('dijet_deta')
     #scalar_vars.append('dijet_dphi')
 
+    print(f"Converting HW to physical values ...")
+    data.x['L1EmulCaloTower'] = analytic.get_pt_eta_phi_from_hw(x=data.x['L1EmulCaloTower'], pt='iet', eta='ieta', phi='iphi')
+
     print(f"Adding sphericity...")
     tower_sphericity = analytic.sphericity(x=data.x['L1EmulCaloTower'], pt='iet', eta='ieta', phi='iphi')
+    jet_sphericity = analytic.sphericity(x=data.x['L1Jet'], pt='pt', eta='eta', phi='phi')
 
-    print("Sphericity")
+    print("Tower Sphericity")
     print(tower_sphericity)
-    
+    print("Jet Sphericity")
+    print(jet_sphericity)
+
     data.x['L1EmulCaloTower_sphericity'] = tower_sphericity
+    data.x['L1Jet_sphericity'] = jet_sphericity
     scalar_vars.append('L1EmulCaloTower_sphericity')
+    scalar_vars.append('L1Jet_sphericity')
 
     print(f"Scalar vars = {scalar_vars}", 'yellow')
 

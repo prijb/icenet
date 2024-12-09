@@ -90,12 +90,25 @@ def diobj_dPhi(x, phi: str):
     """
     return np.abs(phi_phasewrap(x[phi][:, 0] - x[phi][:, 1]))
 
+#Convert HW to physical values
+def get_pt_eta_phi_from_hw(x, pt: str, eta: str, phi: str):
+    """
+    Convert from hardware to physical values
+    """
+    x[pt] = x[pt]*0.5
+    x[eta] = x[eta]*0.087
+    x[phi] = x[phi]*np.pi/36.0
+    x[phi] = phi_phasewrap(x[phi])
+    return x
+
 def get_sphericity(m):
     """
     Matrix is 3x3
 
     Returns lambda2 + lambda3
     """
+    #Normalise to unit determinant
+    #m = m / (np.linalg.det(m)**(1/3))
     vals = np.linalg.eigvals(m)
     vals = np.sort(vals)[::-1]
     return 1.5*(vals[1] + vals[2])
@@ -115,11 +128,11 @@ def sphericity(x, pt: str, eta: str, phi: str):
     #print(x[phi])
 
     #Convert from hardware
-    x[pt] = x[pt]*0.5
-    x[eta] = x[eta]*0.0435
-    x[phi] = x[phi]*0.0435
+    #x[pt] = x[pt]*0.5
+    #x[eta] = x[eta]*0.0435
+    #x[phi] = x[phi]*0.0435
     #Confine to [-pi, pi]
-    x[phi] = phi_phasewrap(x[phi])
+    #x[phi] = phi_phasewrap(x[phi])
 
     print("\nAfter conversion")
     print("pT")
@@ -145,6 +158,15 @@ def sphericity(x, pt: str, eta: str, phi: str):
     #Normalisation
     Spp = Sxx + Syy + Szz
 
+    print("\nSxx")
+    print(Sxx)
+    print("Syy")
+    print(Syy)
+    print("Szz")
+    print(Szz)
+    print("Spp")
+    print(Sxx + Syy + Szz)
+
     #Non-vectorised loops :( , but that's what I'm doing for now bc of this matrix business
     sphericities = []
     for i in range(len(Spp)):
@@ -155,6 +177,10 @@ def sphericity(x, pt: str, eta: str, phi: str):
         S_matrix = np.array([[Sxx[i], Sxy[i], Sxz[i]],
                          [Sxy[i], Syy[i], Syz[i]],
                          [Sxz[i], Syz[i], Szz[i]]]) / Spp[i]
+        #S_matrix = np.array([[Sxx[i], Sxy[i], Sxz[i]],
+        #                 [Sxy[i], Syy[i], Syz[i]],
+        #                 [Sxz[i], Syz[i], Szz[i]]])
+
         sphericities.append(get_sphericity(S_matrix))
 
     sphericities = ak.Array(sphericities)
