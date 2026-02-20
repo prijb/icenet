@@ -21,6 +21,7 @@ mva_param: &MVA_INPUT_PARAM
   jagged_maxdim:   
     Muon: 4
     SV:   4
+    SVOverlap: 4
   
   
   # Filtering of collection entries (for BDT)

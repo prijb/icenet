@@ -10,6 +10,12 @@ MODEL_VARS = [
 ]
 
 # ---------------------------------------------------------
+# For plots, diagnostics ...
+
+KINEMATIC_VARS = [
+]
+
+# ---------------------------------------------------------
 # Trigger flag bit variables
 
 TRIGGER_VARS = [
@@ -80,11 +86,11 @@ MVA_SV_VARS = [
 ]
 
 MVA_SVOVERLAP_VARS = [    
-  'SV_x',       
-  'SV_y',       
-  'SV_z',   
-  'SV_lxy',
-  'SV_l3d',
+  'SVOverlap_x',       
+  'SVOverlap_y',       
+  'SVOverlap_z',   
+  'SVOverlap_lxy',
+  'SVOverlap_l3d',
 ]
 
 # ---------------------------------------------------------
@@ -99,6 +105,7 @@ MVA_JAGGED_VARS  = MVA_MUON_VARS + MVA_SV_VARS + MVA_SVOVERLAP_VARS
 
 LOAD_VARS = []
 
+LOAD_VARS += KINEMATIC_VARS
 LOAD_VARS += TRIGGER_VARS
 LOAD_VARS += MVA_SCALAR_VARS
 LOAD_VARS += MVA_JAGGED_VARS
