@@ -1,0 +1,4 @@
+input:
+  #class_0: !include include/QCD.yml
+  class_0: !include include/dileptonminbias.yml
+  class_1: !include include/scenarioA.yml
