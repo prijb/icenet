@@ -67,7 +67,7 @@ MVA_output:
 
 ## (MVA output x External variable) density (2D)
 MVA_2D:
-  active: False
+  active: True
 
   plot[0]:
     var: ['SV_mass_0', 'SV_mass_1']

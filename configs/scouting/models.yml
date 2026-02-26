@@ -89,9 +89,9 @@ MI_DOMAIN_FILTER: &MI_DOMAIN_FILTER
 # ** Mutual Information regularization **
 MI_REG_PARAM: &MI_REG_PARAM
   
-  classes: [0,-2]          #  Which classes to use in the regularization
+  classes: [0]          #  Which classes to use in the regularization
   
-  losstype: 'DCORR'        # 'MINE', 'MINE_EMA', 'DENSITY', 'DCORR', 'PEARSON' (use PEARSON only for debug)
+  losstype: 'MINE'        # 'MINE', 'MINE_EMA', 'DENSITY', 'DCORR', 'PEARSON' (use PEARSON only for debug)
   min_count: 32            #  Minimum number of events (per category)
   max_N: 5000              #  Maximum number of events per function call (use to limit sample size for DCORR)
   min_score: null           #  Consider only events with MVA output [0,1] larger than this value (null for None)
@@ -100,14 +100,14 @@ MI_REG_PARAM: &MI_REG_PARAM
   # ------------------
   # Neural MI param
 
-  eval_batch_size: 8192    #  Evaluation batch size (pure memory <-> time tradeoff)
+  eval_batch_size: 999999    #  Evaluation batch size (pure memory <-> time tradeoff)
   alpha:  0.01             #  Exponential Moving Average (EMA) coupling parameter
   ma_eT:  [null, null]     #  EMA tracking values (set for each class!)
   
   y_dim: [1]               #  dimensionality ([1] for NN scalar output Z vs target X)
   
   epochs: 5
-  batch_size: 256          #  if the estimate (network) turns into NaN, try tuning batch size, lr, weight decay ...
+  batch_size: 999999          #  if the estimate (network) turns into NaN, try tuning batch size, lr, weight decay ...
   lr: 1.0e-4
   weight_decay: 1.0e-2
   clip_norm: 1.0
@@ -271,7 +271,8 @@ iceboost01-MI:
   #include_MVA_vars: ['.*']
   
   MI_param:
-    beta: [0.1, 0.1]         # Positive for minimizing (per class in use)
+    #beta: [0.1, 0.1]         # Positive for minimizing (per class in use)
+    beta: [0.1] 
     <<: *MI_REG_PARAM
 
 # ICEBOOST with Domain Adaptation

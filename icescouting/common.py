@@ -84,7 +84,6 @@ def load_root_file(root_path, ids=None, entry_start=0, entry_stop=None, maxevent
     p = p / np.sum(p)
     
     # Theory parameter sampling
-    """
     # We pick all variables at once
     # (so N-dim random variable N-tuplets are sampled 1-to-1 as in the signal class)
     var = inputvars.MODEL_VARS
@@ -114,7 +113,6 @@ def load_root_file(root_path, ids=None, entry_start=0, entry_stop=None, maxevent
             var_new = [s.replace('MODEL', 'GEN') for s in var]
             for i in range(len(var)):
                 X[key][var_new[i]] = new[:,i].squeeze().tolist()
-    """
     
     # =================================================================
     # *** Finally combine ***
@@ -235,6 +233,7 @@ def splitfactor(x, y, w, ids, args, skip_graph=True, use_dequantize=True):
                 
                 print(f'Dequantizing conditional "{var}" with iDQF', 'yellow')
                 data.x[var] = dequantize.iDQF(x=ak.to_numpy(ak.ravel(data.x[var])), n_interp=n_interp, kind=kind)
+                
     # -------------------------------------------------------------------------
     ## ** Collection filter **
     

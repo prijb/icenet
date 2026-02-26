@@ -9,6 +9,13 @@ MODEL_VARS = [
   'MODEL_ctau'
 ]
 
+KINEMATIC_GEN_VARS = [
+  'GEN_mpi',
+  'GEN_mA',
+  'GEN_ctau'
+]
+
+
 # ---------------------------------------------------------
 # For plots, diagnostics ...
 
@@ -96,8 +103,8 @@ MVA_SVOVERLAP_VARS = [
 # ---------------------------------------------------------
 # Combine logical sets
 
+KINEMATIC_VARS += KINEMATIC_GEN_VARS
 MVA_SCALAR_VARS += MODEL_VARS         
-
 MVA_JAGGED_VARS  = MVA_MUON_VARS + MVA_SV_VARS + MVA_SVOVERLAP_VARS
 
 # ---------------------------------------------------------
