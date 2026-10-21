@@ -39,7 +39,8 @@ def get_function_maps():
              'CB_pdf':            CB_pdf,
              'DSCB_pdf':          DSCB_pdf,
              'gauss_pdf':         gauss_pdf,
-             'voigt_pdf':         voigt_pdf}
+             'voigt_pdf':         voigt_pdf,
+             'gauss_DSCB_sum_pdf': gauss_DSCB_sum_pdf}
 
     return fmaps
 
@@ -263,20 +264,18 @@ def DSCB_pdf(x: np.ndarray, par: np.ndarray, EPS: float=1E-12, norm=False):
     return y
 
 def generic_conv_pdf(x: np.ndarray, par: np.ndarray, pdf_pair: List[str],
-                     par_index: List[int], xfactor: float=0.2, Nmin: int=256,
-                     kind='linear', norm=False):
+                     par_index: List[int], xfactor: float=0.2, Nmin: int=256, norm=False):
     """
-    Convolution between two functions
+    Convolution between two functions.
     
     Args:
         x:         function argument
         par:       function parameters from the (fit) routine
         pdf_pair:  names of two functions, e.g. ['CBW_pdf', 'G_pdf']
         par_index: indices of the parameter per pair, e.g. [[0,1,2], [3,4]]
+        norm:      normalize the integral
         xfactor:   domain extension factor
         Nmin:      minimum number of function sample points
-        kind:      final sampling interpolation type ('linear', 'quadratic', ...)
-        norm:      normalize the integral
     """
 
     func0 = eval(f'{pdf_pair[0]}')
@@ -289,25 +288,40 @@ def generic_conv_pdf(x: np.ndarray, par: np.ndarray, pdf_pair: List[str],
     xp = highres_x(x=x, xfactor=xfactor, Nmin=Nmin)
     f0 = func0(x=xp, par=f0_param, norm=False)
     f1 = func1(x=xp, par=f1_param, norm=False)
-    
-    dx = xp[1] - xp[0]
-    yp = np.convolve(a=f0, v=f1, mode='same') * dx
-    y  = interpolate.interp1d(x=xp, y=yp, kind=kind)(x)
+    yp = np.convolve(a=f0, v=f1, mode='same')
+    y  = interpolate.interp1d(xp, yp)(x)
     
     if norm:
         y = y / np.trapz(y=y, x=x)
     
     return y
 
+#Custom function
+#Sum of Gaussian and DCB
+def gauss_DSCB_sum_pdf(x: np.ndarray, par: np.ndarray, EPS: float=1E-12, norm=False):
+    """
+    Args:
+        par: mu > 0, sigma > 0, n_low > 1, alpha_low > 0, n_high > 1, alpha_high > 0, dcb_frac < 1
+    """
+    par_gauss = par[:2]
+    par_dcb = par[:-1]
+
+    y_gauss = gauss_pdf(x, par_gauss, norm=norm)
+    y_dcb = DSCB_pdf(x, par_dcb, norm=norm)
+
+    y = (par[-1] * y_dcb) + ((1 - par[-1]) * y_gauss)
+
+    return y                       
+
 @numba.njit
-def highres_x(x: np.ndarray, xfactor: float=0.5, Nmin: int=256):
+def highres_x(x: np.ndarray, xfactor: float=0.2, Nmin: int=256):
     """
     Extend range and sampling of x.
     
     Args:
-        x:       Array of values
-        xfactor: Domain extension factor (e.g. 0.2 gives +- 20%)
-        Nmin:    Minimum number of samples
+        x:       Array of values.
+        xfactor: Domain extension factor (default is 0.2).
+        Nmin:    Minimum number of samples (default is 256).
     
     Returns:
         np.ndarray: Extended high-resolution array.
@@ -356,7 +370,7 @@ def edges2binwidth(edges):
     """ Bin edges to binwidths """
     return edges[1:] - edges[:-1]
 
-def TH1_to_numpy(hist, dtype=np.float64):
+def TH1_to_numpy(hist):
     """
     Convert TH1 (ROOT) histogram to numpy array
     
@@ -368,10 +382,10 @@ def TH1_to_numpy(hist, dtype=np.float64):
     #   print(f'{n} {v}')
 
     hh         = hist.to_numpy()
-    counts     = np.array(hist.values(), dtype=dtype)
-    errors     = np.array(hist.errors(), dtype=dtype)
+    counts     = np.array(hist.values())
+    errors     = np.array(hist.errors())
 
-    bin_edges  = np.array(hh[1], dtype=dtype)
+    bin_edges  = np.array(hh[1])
     bin_center = edges2centerbins(bin_edges)
     bin_width  = edges2binwidth(bin_edges)
     
@@ -935,15 +949,28 @@ def analyze_1D_fit(hist, param: dict, techno: dict, fitfunc,
     N     = {}
     N_err = {}
     
-    for key in components:
-        
-        y[key] = fitfunc(cbins[range_mask], par, par_fixed,
-                         components=None if key == 'tot' else [key], edges=bin_edges[edges_range_mask])
-        
-        y[key][~np.isfinite(y[key])] = 0.0 # Protect for nan/inf
+    # To code: exception for invalid fit (cov[0][0] = -1)
+    if cov[0][0] > 0:
+        for key in components:
+            
+            y[key] = fitfunc(cbins[range_mask], par, par_fixed,
+                            components=None if key == 'tot' else [key], edges=bin_edges[edges_range_mask])
+            
+            y[key][~np.isfinite(y[key])] = 0.0 # Protect for nan/inf
 
-        # Compute total count as a bin-wise sum
-        N[key] = np.sum(y[key])
+            # Compute total count as a bin-wise sum
+            N[key] = np.sum(y[key])
+    else: 
+        cprint('Missing covariance matrix, using counts in signal region as a proxy', 'red')
+        N_sum = np.sum(counts[range_mask][fitbin_mask])
+        N['tot'] = N_sum
+        N['S'] = N_sum
+        N['B'] = 0
+
+        y['tot'] = fitfunc(cbins[range_mask], par, par_fixed, components=None, edges=bin_edges[edges_range_mask])
+        y['tot'][~np.isfinite(y['tot'])] = 0.0 # Protect for nan/inf
+        y['S'] = y['tot']
+        y['B'] = np.zeros_like(y['tot'])
     
     # --------------------------------------------------------------------
     # Estimate the yield uncertainty via Monte Carlo
@@ -1416,7 +1443,7 @@ def read_yaml_input(inputfile, fit_type=None):
     
     return param, fitfunc, cfunc, steer['techno']
 
-def integral_wrapper(lambdafunc, x, edges, norm=False, N_int: int=128, EPS=1E-8, **args):
+def integral_wrapper(lambdafunc, x, edges, norm=False, N_int: int=128, EPS=1E-12, **args):
     """
     Wrapper function for integral normalization
     
@@ -1430,8 +1457,7 @@ def integral_wrapper(lambdafunc, x, edges, norm=False, N_int: int=128, EPS=1E-8,
     if norm:
         # Normalization based on a numerical integral over edge bounds
         x_fine = np.linspace(edges[0], edges[-1], N_int)
-        y_fine = lambdafunc(x_fine)
-        I = max(np.trapz(x=x_fine, y=y_fine), EPS)
+        I = max(np.trapz(y=lambdafunc(x_fine), x=x_fine), EPS)
         
         return f / I * edges2binwidth(edges)
     else:

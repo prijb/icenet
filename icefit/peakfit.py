@@ -52,61 +52,84 @@ def get_rootfiles_jpsi(input_path='/', years=[2016, 2017, 2018],
     """
     all_years = []
     
-    setup = [
+    # setup = [
     
-        ## Num/Den type A
-        {
-            'NUM_DEN': ['LooseID', 'TrackerMuons'],
-            'OBS':     ['absdxy'],
-            'BINS':    [[1,2,3]]
-        },
-        {
-            'NUM_DEN': ['LooseID', 'TrackerMuons'],
-            'OBS':     ['absdxy_hack', 'pt'],
-            'BINS':    [[1,2,3,4], [1,2,3,4,5]]
-        },
-        {
-            'NUM_DEN': ['LooseID', 'TrackerMuons'],
-            'OBS':     ['absdxy', 'pt'],
-            'BINS':    [[1,2,3], [1,2,3,4,5]]
-        },
-        {
-            'NUM_DEN': ['LooseID', 'TrackerMuons'],
-            'OBS':     ['abseta', 'pt'],
-            'BINS':    [[1,2,3,4,5], [1,2,3,4,5]]
-        },
-        {
-            'NUM_DEN': ['LooseID', 'TrackerMuons'],
-            'OBS':     ['eta'],
-            'BINS':    [[1,2,3,4,5,6,7,8,9,10]]
-        },
+    #     ## Num/Den type A
+    #     {
+    #         'NUM_DEN': ['LooseID', 'TrackerMuons'],
+    #         'OBS':     ['absdxy'],
+    #         'BINS':    [[1,2,3]]
+    #     },
+    #     {
+    #         'NUM_DEN': ['LooseID', 'TrackerMuons'],
+    #         'OBS':     ['absdxy_hack', 'pt'],
+    #         'BINS':    [[1,2,3,4], [1,2,3,4,5]]
+    #     },
+    #     {
+    #         'NUM_DEN': ['LooseID', 'TrackerMuons'],
+    #         'OBS':     ['absdxy', 'pt'],
+    #         'BINS':    [[1,2,3], [1,2,3,4,5]]
+    #     },
+    #     {
+    #         'NUM_DEN': ['LooseID', 'TrackerMuons'],
+    #         'OBS':     ['abseta', 'pt'],
+    #         'BINS':    [[1,2,3,4,5], [1,2,3,4,5]]
+    #     },
+    #     {
+    #         'NUM_DEN': ['LooseID', 'TrackerMuons'],
+    #         'OBS':     ['eta'],
+    #         'BINS':    [[1,2,3,4,5,6,7,8,9,10]]
+    #     },
         
-        ## Num/Den type B
+    #     ## Num/Den type B
+    #     {
+    #         'NUM_DEN': ['MyNum', 'MyDen'],
+    #         'OBS':     ['absdxy'],
+    #         'BINS':    [[1,2,3]]
+    #     },
+    #     {
+    #         'NUM_DEN': ['MyNum', 'MyDen'],
+    #         'OBS':     ['absdxy_hack', 'pt'],
+    #         'BINS':    [[1,2,3,4], [1,2,3,4,5]]
+    #     },
+    #     {
+    #         'NUM_DEN': ['MyNum', 'MyDen'],
+    #         'OBS':     ['absdxy', 'pt'],
+    #         'BINS':    [[1,2,3], [1,2,3,4,5]]
+    #     },
+    #     {
+    #         'NUM_DEN': ['MyNum', 'MyDen'],
+    #         'OBS':     ['abseta', 'pt'],
+    #         'BINS':    [[1,2,3,4,5], [1,2,3,4,5]]
+    #     },
+    #     {
+    #         'NUM_DEN': ['MyNum', 'MyDen'],
+    #         'OBS':     ['eta'],
+    #         'BINS':    [[1,2,3,4,5,6,7,8,9,10]]
+    #     }
+    # ]
+
+    setup = [
         {
-            'NUM_DEN': ['MyNum', 'MyDen'],
-            'OBS':     ['absdxy'],
-            'BINS':    [[1,2,3]]
+            'NUM_DEN': ['PassMuTrigger', 'TriggerDen'],
+            'OBS': ['pt'],
+            'BINS': [[1, 2, 3, 4]]
         },
         {
-            'NUM_DEN': ['MyNum', 'MyDen'],
-            'OBS':     ['absdxy_hack', 'pt'],
-            'BINS':    [[1,2,3,4], [1,2,3,4,5]]
+            'NUM_DEN': ['PassMuTrigger', 'TriggerDen'],
+            'OBS': ['lxy'],
+            'BINS': [[1, 2, 3, 4, 5, 6]]
         },
         {
-            'NUM_DEN': ['MyNum', 'MyDen'],
-            'OBS':     ['absdxy', 'pt'],
-            'BINS':    [[1,2,3], [1,2,3,4,5]]
+            'NUM_DEN': ['PassMuTrigger', 'TriggerDen'],
+            'OBS': ['pt', 'lxy'],
+            'BINS': [[1, 2, 3, 4], [1, 2, 3, 4, 5, 6]]
         },
         {
-            'NUM_DEN': ['MyNum', 'MyDen'],
-            'OBS':     ['abseta', 'pt'],
-            'BINS':    [[1,2,3,4,5], [1,2,3,4,5]]
+            'NUM_DEN': ['PassMuTrigger', 'TriggerDen'],
+            'OBS': ['pt_slice', 'lxy'],
+            'BINS': [[1, 2], [1, 2, 3, 4, 5, 6]]
         },
-        {
-            'NUM_DEN': ['MyNum', 'MyDen'],
-            'OBS':     ['eta'],
-            'BINS':    [[1,2,3,4,5,6,7,8,9,10]]
-        }
     ]
     
     if test_mode:
@@ -125,7 +148,7 @@ def get_rootfiles_jpsi(input_path='/', years=[2016, 2017, 2018],
     for YEAR in years:
         info = {}
         
-        for GENTYPE in ['JPsi_pythia8', f'Run{YEAR}_UL']: # MC or Data
+        for GENTYPE in ['JPsi_pythia8', f'Run{YEAR}']: # MC or Data
             files = []
             
             for SYST in systematics:
@@ -138,7 +161,7 @@ def get_rootfiles_jpsi(input_path='/', years=[2016, 2017, 2018],
                     # 1D histograms
                     if   len(OBS) == 1:
                         
-                        rootfile = f'{input_path}/Run{YEAR}_UL/{GENTYPE}/{SYST}/NUM_{NUM_DEN[0]}_DEN_{NUM_DEN[1]}_{OBS[0]}.root'
+                        rootfile = f'{input_path}/Run{YEAR}/{GENTYPE}/{SYST}/NUM_{NUM_DEN[0]}_DEN_{NUM_DEN[1]}_{OBS[0]}.root'
                         
                         # Binning
                         for BIN0 in BINS[0]:
@@ -155,7 +178,7 @@ def get_rootfiles_jpsi(input_path='/', years=[2016, 2017, 2018],
                     # 2D histograms
                     elif len(OBS) == 2:
                         
-                        rootfile = f'{input_path}/Run{YEAR}_UL/{GENTYPE}/{SYST}/NUM_{NUM_DEN[0]}_DEN_{NUM_DEN[1]}_{OBS[0]}_{OBS[1]}.root'
+                        rootfile = f'{input_path}/Run{YEAR}/{GENTYPE}/{SYST}/NUM_{NUM_DEN[0]}_DEN_{NUM_DEN[1]}_{OBS[0]}_{OBS[1]}.root'
                         
                         # Binning
                         for BIN0 in BINS[0]:
@@ -192,7 +215,7 @@ def fit_task(f, inputparam, savepath, YEAR, GENTYPE):
     techno  = inputparam['techno']
     
     if not os.path.exists(savepath):
-        os.makedirs(savepath)
+        os.makedirs(savepath, exist_ok=True)
 
     # Over 'Pass' and 'Fail' type
     for key in f.keys():
@@ -205,17 +228,48 @@ def fit_task(f, inputparam, savepath, YEAR, GENTYPE):
         hist_    = {f'{key}': hist}
         fitfunc_ = {f'{key}': fitfunc}
         
-        # Fit and analyze
+        # Fit
         par,cov,var2pos,m1 = icepeak.binned_1D_fit(hist=hist_, param=param, fitfunc=fitfunc_, 
                                 techno=techno, par_fixed=None)
-        output = icepeak.analyze_1D_fit(hist=hist, param=param, fitfunc=fitfunc,
-                                            techno=techno, par=par, cov=cov, par_fixed=None)
         
         # Create savepath
         total_savepath = f'{savepath}/Run{YEAR}/{GENTYPE}/{SYST}'
         if not os.path.exists(total_savepath):
-            os.makedirs(total_savepath)
+            os.makedirs(total_savepath, exist_ok=True)
 
+        # Skip zero count histograms
+        hist_temp = icepeak.TH1_to_numpy(hist)
+        print("Total counts in histogram:", np.sum(hist_temp['counts']))
+        if np.sum(hist_temp['counts']) == 0:
+            cprint(f"Key: {key}", 'red')
+            cprint("Skipping histogram with zero counts", 'red')
+            
+            #Save a dummy dictionary
+            par_dict, cov_arr = icepeak.iminuit2python(par=par, cov=cov, var2pos=var2pos)
+            outdict = {'par':     par_dict,
+                   'cov':     cov_arr,
+                   'var2pos': var2pos,
+                   'param':   param,
+                   'techno':  techno}
+            
+            N = {'S': 0, 'B': 0}
+            N_err = {'S': 0, 'B': 0}
+            
+            output = {'fig': None, 'ax': None, 'h': hist, 'N': N,
+            'N_err': N_err, 'chi2': -999, 'ndof': -999,
+            'pulls': None, 'fig_pulls': None, 'ax_pulls': None}
+
+            outdict = outdict | output # Combine
+
+            filename = f"{total_savepath}/{tree}.pkl"
+            pickle.dump(outdict, open(filename, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+            cprint(f'Fit results saved to: {filename} (pickle) \n\n', 'green')
+
+            continue
+        
+        # Analyze
+        output = icepeak.analyze_1D_fit(hist=hist, param=param, fitfunc=fitfunc,
+                                            techno=techno, par=par, cov=cov, par_fixed=None)
         # Save the fit plot
         plt.figure(output['fig'])
         plt.savefig(f'{total_savepath}/{tree}.pdf', bbox_inches='tight')
@@ -276,7 +330,7 @@ def fit_task_multi(f, inputparam, savepath, YEAR, GENTYPE):
     techno  = inputparam['techno']
 
     if not os.path.exists(savepath):
-        os.makedirs(savepath)
+        os.makedirs(savepath, exist_ok=True)
 
     # Collect 'Pass' and 'Fail' type histograms
     hist = {}
@@ -302,16 +356,47 @@ def fit_task_multi(f, inputparam, savepath, YEAR, GENTYPE):
     # Analyze and plot Pass, Fail seperately
     for idx, key in enumerate(f.keys()):
         
-        output = icepeak.analyze_1D_fit(hist=hist[key], param=param, fitfunc=fitfunc[key],
-                    techno=techno, par=par, cov=cov, par_fixed=par_fixed)
-
         SYST = f[key]["SYST"]
         tree = f[key]["tree"]
         
         # Create savepath
         total_savepath = f'{savepath}/Run{YEAR}/{GENTYPE}/{SYST}'
         if not os.path.exists(total_savepath):
-            os.makedirs(total_savepath)
+            os.makedirs(total_savepath, exist_ok=True)
+
+        #Skip zero count histograms
+        hist_temp = icepeak.TH1_to_numpy(hist[key])
+        print("Total counts in histogram:", np.sum(hist_temp['counts']))
+
+        if np.sum(hist_temp['counts']) == 0:
+            cprint(f"Key: {key}", 'red')
+            cprint("Skipping histogram with zero counts", 'red')
+            
+            #Save a dummy dictionary
+            par_dict, cov_arr = icepeak.iminuit2python(par=par, cov=cov, var2pos=var2pos)
+            outdict = {'par':     par_dict,
+                   'cov':     cov_arr,
+                   'var2pos': var2pos,
+                   'param':   param,
+                   'techno':  techno}
+            
+            N = {'S': 0, 'B': 0}
+            N_err = {'S': 0, 'B': 0}
+
+            output = {'fig': None, 'ax': None, 'h': hist, 'N': N,
+            'N_err': N_err, 'chi2': -999, 'ndof': -999,
+            'pulls': None, 'fig_pulls': None, 'ax_pulls': None}
+
+            outdict = outdict | output # Combine
+
+            filename = f"{total_savepath}/{tree}.pkl"
+            pickle.dump(outdict, open(filename, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+            cprint(f'Fit results saved to: {filename} (pickle) \n\n', 'green')
+
+            continue
+
+        output = icepeak.analyze_1D_fit(hist=hist[key], param=param, fitfunc=fitfunc[key],
+                    techno=techno, par=par, cov=cov, par_fixed=par_fixed)
 
         # Save the fit plot
         plt.figure(output['fig'])
@@ -385,7 +470,7 @@ def run_jpsi_peakfit(inputparam, savepath):
         
         tmpdir = os.getcwd() + '/tmp'
         if not os.path.exists(tmpdir):
-            os.makedirs(tmpdir)
+            os.makedirs(tmpdir, exist_ok=True)
         
         ray.init(num_cpus=num_cpus, _temp_dir=tmpdir) # Start Ray
         result_ids = []
@@ -461,7 +546,7 @@ def run_jpsi_tagprobe(inputparam, savepath):
         YEAR     = y['YEAR']
         
         mc_key   = f'JPsi_pythia8'
-        data_key = f'Run{YEAR}_UL'
+        data_key = f'Run{YEAR}'
 
         # Loop over observables -- pick 'data_key'
         # (both data and mc have the same observables)
@@ -474,11 +559,12 @@ def run_jpsi_tagprobe(inputparam, savepath):
             # Create savepath
             total_savepath = f'{savepath}/Run{YEAR}/Efficiency/{SYST}'
             if not os.path.exists(total_savepath):
-                os.makedirs(total_savepath)
+                os.makedirs(total_savepath, exist_ok=True)
 
-            tree    = f[KEY]['tree'].replace(f"_{KEY}", "")
+            tree = f[KEY]['tree'].removesuffix(f"_{KEY}")
             eff     = {}
             eff_err = {}
+            eff_err_asym = {}
 
             # Loop over data and MC
             for GENTYPE in [data_key, mc_key]:
@@ -496,6 +582,13 @@ def run_jpsi_tagprobe(inputparam, savepath):
                     if (N['Pass'] + N['Fail']) > 0:
                         eff[GENTYPE]     = N['Pass'] / (N['Pass'] + N['Fail'])
                         eff_err[GENTYPE] = statstools.tpratio_taylor(x=N['Pass'], y=N['Fail'], x_err=N_err['Pass'], y_err=N_err['Fail'])
+
+                        #Testing clopper pearson
+                        eff_err_asym_temp = statstools.clopper_pearson_err(N['Pass'], N['Pass'] + N['Fail'])
+                        upper_err_temp = eff_err_asym_temp[1] - eff[GENTYPE]
+                        lower_err_temp = eff[GENTYPE] - eff_err_asym_temp[0]
+                        print(f"Efficiency (Clopper Pearson): {eff[GENTYPE]:0.3f} + {upper_err_temp:0.3f} - {lower_err_temp:0.3f}")
+                        
                     else:
                         cprint('Signal efficiency cannot be extracted (set nan)', 'red')
                         eff[GENTYPE]     = np.nan
@@ -532,6 +625,12 @@ def run_jpsi_tagprobe(inputparam, savepath):
                         eff[GENTYPE]     = par[ID]
                         eff_err[GENTYPE] = statstools.tpratio_taylor(x=N['Pass'], y=N['Fail'], x_err=N_err['Pass'], y_err=N_err['Fail'])
 
+                        #Testing clopper pearson
+                        eff_err_asym_temp = statstools.clopper_pearson_err(N['Pass'], N['Pass'] + N['Fail'])
+                        upper_err_temp = eff_err_asym_temp[1] - eff[GENTYPE]
+                        lower_err_temp = eff[GENTYPE] - eff_err_asym_temp[0]
+                        print(f"Efficiency (Clopper Pearson): {eff[GENTYPE]:0.3f} + {upper_err_temp:0.3f} - {lower_err_temp:0.3f}")
+
                     else:
                         cprint('Signal efficiency cannot be extracted (set nan)', 'red')
                         eff[GENTYPE]     = np.nan
@@ -547,20 +646,28 @@ def run_jpsi_tagprobe(inputparam, savepath):
             # --------------------------------------- 
             ## ** Compute scale factor Data / MC **
             
-            if (eff[data_key] > 0) and (eff[mc_key] > 0):
-                scale     = eff[data_key] / eff[mc_key]
-                scale_err = statstools.ratio_eprop(A=eff[data_key], B=eff[mc_key], \
-                                sigmaA=eff_err[data_key], sigmaB=eff_err[mc_key], sigmaAB=0)
+            skip_mc = True
+            if mc_key in eff.keys(): skip_mc = False
+            
+            #Only do this if there's a valid mc key
+            if not skip_mc:
+                if (eff[data_key] > 0) and (eff[mc_key] > 0):
+                    scale     = eff[data_key] / eff[mc_key]
+                    scale_err = statstools.ratio_eprop(A=eff[data_key], B=eff[mc_key], \
+                                    sigmaA=eff_err[data_key], sigmaB=eff_err[mc_key], sigmaAB=0)
+                else:
+                    cprint('Scale factor cannot be extracted (set nan)', 'red')
+                    scale     = np.nan
+                    scale_err = np.nan
+                
+                cprint(f'Data / MC:  {scale:0.3f} +- {scale_err:0.3f} (scale factor) \n', 'yellow')
+                # --------------------------------------- 
+                
+                ### Save results
+                outdict  = {'eff': eff, 'eff_err': eff_err, 'scale': scale, 'scale_err': scale_err}
             else:
-                cprint('Scale factor cannot be extracted (set nan)', 'red')
-                scale     = np.nan
-                scale_err = np.nan
-            
-            cprint(f'Data / MC:  {scale:0.3f} +- {scale_err:0.3f} (scale factor) \n', 'yellow')
-            # --------------------------------------- 
-            
-            ### Save results
-            outdict  = {'eff': eff, 'eff_err': eff_err, 'scale': scale, 'scale_err': scale_err}
+                print("No MC key found, setting scales to nan")
+                outdict  = {'eff': eff, 'eff_err': eff_err, 'scale': np.nan, 'scale_err': np.nan}
             filename = f"{total_savepath}/{tree}.pkl"
             pickle.dump(outdict, open(filename, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
             cprint(f'Efficiency and scale factor results saved to: {filename} (pickle)', 'green')
@@ -617,7 +724,7 @@ def fit_and_analyze(p):
         ### Execute yield fit and compute tag & probe efficiency
         outputdir = os.getcwd() + f'/output/peakfit/{p["param"]["output_name"]}/fitparam_{VARIATION}'
         if not os.path.exists(outputdir):
-            os.makedirs(outputdir)
+            os.makedirs(outputdir, exist_ok=True)
         
         run_jpsi_peakfit(inputparam=p,  savepath=outputdir)
         run_jpsi_tagprobe(inputparam=p, savepath=outputdir)
@@ -660,7 +767,7 @@ def group_systematics(p):
         ## Save collected results
         savepath = os.getcwd() + f'/output/peakfit/{p["param"]["output_name"]}'
         if not os.path.exists(savepath):
-            os.makedirs(savepath)
+            os.makedirs(savepath, exist_ok=True)
 
         filename = f'{savepath}/peakfit_systematics_YEAR_{YEAR}.pkl'
         pickle.dump(d, open(filename, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
