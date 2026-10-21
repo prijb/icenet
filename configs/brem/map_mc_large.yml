@@ -1,3 +1,0 @@
-input:
-  class_0:  !include include/qcd_large.yml
-  class_1:  !include include/signal_large.yml

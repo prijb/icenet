@@ -1,9 +1,0 @@
-# [0]
-QCD: &QCD
-  path: 'actions-stash/input/icebrem'
-  files: 'output_qcd_10k.root'
-  xs: 1.
-  model_param: null
-  force_xs: false
-  isMC:     true
-  maxevents_scale: 1.

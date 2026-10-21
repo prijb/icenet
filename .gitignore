@@ -1,56 +1,14 @@
-# Files ignored in GIT
-
-*.pdf
-*.pth
-*.dat
-*.profile
-*.exe
-*.hd5
-*.parquet
+__pycache__/
+*.pyc
+*.pyo
 *.pkl
-*.pt
-*.zip
-*.text
 *.log
-*.out
-*.output
-#*.json
-#*.txt
 
-core.*
-
-!docs/pdf/*.pdf
-
-travis-stash/
-actions-stash/
-dataset/
-tensorboard/
-data/
-trash/
-dev/
-checkpoint/
-figs/
 output/
-testfigs/
-tbfigs/
 tmp/
 
-# torch-geometric test data
-tests/Planetoid
+.venv/
+venv/
+env/
 
-# 
-.ipynb_checkpoints
-style_output/
-debug_output/
-debut_output_e/
-
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-
-todo
-test.py
-dev_*
-tmp_*
-
-.pytest_cache
+.DS_Store

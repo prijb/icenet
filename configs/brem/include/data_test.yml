@@ -1,9 +1,0 @@
-# [0]
-DATA: &DATA
-  path: 'actions-stash/input/icebrem'
-  files: 'output_data_10k.root'
-  xs: 1.
-  model_param: null
-  force_xs: false
-  isMC:     false
-  maxevents_scale: 1.

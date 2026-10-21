@@ -1,20 +1,10 @@
--r requirements-aux.txt
-
-# PYTORCH
---extra-index-url https://download.pytorch.org/whl/cu118
-torch==2.7.1
-torchvision==0.22.1
-torchaudio==2.7.1
-
-# PYTORCH-GEOMETRIC
--f https://data.pyg.org/whl/torch-2.7.0+cu118.html
-torch_geometric==2.6.1
-
-## some of these can give problems e.g. with GLIBC 2.27 (comment out)
--f https://data.pyg.org/whl/torch-2.7.0+cu118.html
-torch_sparse==0.6.18
-torch_scatter==2.1.2
-
-#pyg_lib==0.4.0
-#torch_cluster==1.6.3
-#torch_spline_conv==1.2.2
+numpy==1.24.4
+numba==0.61.0
+scipy==1.15.2
+matplotlib==3.10.0
+iminuit==2.30.1
+mystic==0.4.3
+uproot==5.5.2
+ray==2.42.1
+PyYAML==6.0.1
+termcolor==2.4.0
