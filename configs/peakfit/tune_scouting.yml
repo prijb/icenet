@@ -11,7 +11,7 @@
 
 # For SnT Scouting
 
-input_path: '/vols/cms/pb4918/dqcd_analysis/Oct24/dqcd/trigger_histos/prod191026/muon/generalTracks/JPsi'
+input_path: '/eos/user/p/ppradeep/HLTScouting/MuonPOG/Oct26/TriggerSF_Fits/flat/muon/generalTracks/JPsi'
 output_name:  'tune_scouting'
 
 years:    [2022]
@@ -89,6 +89,7 @@ fit:
 # Fit algorithm parameters
 techno:
   rng_seed: 1234
+  rebin: 2
 
   loss_type: 'chi2'                # 'chi2', 'huber', 'nll'
   use_limits: True                 # Use parameter bounds

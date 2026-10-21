@@ -127,7 +127,7 @@ def get_rootfiles_jpsi(input_path='/', years=[2016, 2017, 2018],
         },
         {
             'NUM_DEN': ['PassMuTrigger', 'TriggerDen'],
-            'OBS': ['pt_slice', 'lxy'],
+            'OBS': ['pt_lxy_slice', 'lxy'],
             'BINS': [[1, 2], [1, 2, 3, 4, 5, 6]]
         },
     ]
@@ -238,7 +238,7 @@ def fit_task(f, inputparam, savepath, YEAR, GENTYPE):
             os.makedirs(total_savepath, exist_ok=True)
 
         # Skip zero count histograms
-        hist_temp = icepeak.TH1_to_numpy(hist)
+        hist_temp = icepeak.TH1_to_numpy(hist, rebin=techno.get('rebin', 1))
         print("Total counts in histogram:", np.sum(hist_temp['counts']))
         if np.sum(hist_temp['counts']) == 0:
             cprint(f"Key: {key}", 'red')
@@ -341,8 +341,8 @@ def fit_task_multi(f, inputparam, savepath, YEAR, GENTYPE):
     # --------------------------------------------------------------------
     # Set fixed parameters
     
-    d_pass = icepeak.hist_decompose(icepeak.TH1_to_numpy(hist['Pass']), param=param, techno=techno)
-    d_fail = icepeak.hist_decompose(icepeak.TH1_to_numpy(hist['Fail']), param=param, techno=techno)
+    d_pass = icepeak.hist_decompose(icepeak.TH1_to_numpy(hist['Pass'], rebin=techno.get('rebin', 1)), param=param, techno=techno)
+    d_fail = icepeak.hist_decompose(icepeak.TH1_to_numpy(hist['Fail'], rebin=techno.get('rebin', 1)), param=param, techno=techno)
     
     par_fixed = {'C_pass': d_pass['num_counts_in_fit'],
                  'C_fail': d_fail['num_counts_in_fit']}
@@ -365,7 +365,7 @@ def fit_task_multi(f, inputparam, savepath, YEAR, GENTYPE):
             os.makedirs(total_savepath, exist_ok=True)
 
         #Skip zero count histograms
-        hist_temp = icepeak.TH1_to_numpy(hist[key])
+        hist_temp = icepeak.TH1_to_numpy(hist[key], rebin=techno.get('rebin', 1))
         print("Total counts in histogram:", np.sum(hist_temp['counts']))
 
         if np.sum(hist_temp['counts']) == 0:

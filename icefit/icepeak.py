@@ -370,22 +370,29 @@ def edges2binwidth(edges):
     """ Bin edges to binwidths """
     return edges[1:] - edges[:-1]
 
-def TH1_to_numpy(hist):
+def TH1_to_numpy(hist, rebin=1):
     """
     Convert TH1 (ROOT) histogram to numpy array
     
     Args:
-        hist: TH1 object (from uproot)
+        hist:  TH1 object (from uproot)
+        rebin: Rebinning factor
     """
-
-    #for n, v in hist.__dict__.items(): # class generated on the fly
-    #   print(f'{n} {v}')
 
     hh         = hist.to_numpy()
     counts     = np.array(hist.values())
     errors     = np.array(hist.errors())
 
     bin_edges  = np.array(hh[1])
+
+    if rebin > 1:
+        if len(counts) % rebin != 0:
+            raise Exception(f'Cannot rebin histogram with {len(counts)} bins by factor {rebin}')
+
+        counts = np.sum(counts.reshape(-1, rebin), axis=1)
+        errors = np.sqrt(np.sum(errors.reshape(-1, rebin)**2, axis=1))
+        bin_edges = bin_edges[::rebin]
+
     bin_center = edges2centerbins(bin_edges)
     bin_width  = edges2binwidth(bin_edges)
     
@@ -536,7 +543,7 @@ def binned_1D_fit(hist: dict, param: dict, fitfunc: dict, techno: dict, par_fixe
     # Pick single or two histograms (when 'dual' modes)
     for key in h.keys():
         
-        h[key] = TH1_to_numpy(hist[key])
+        h[key] = TH1_to_numpy(hist[key], rebin=techno.get('rebin', 1))
         d      = hist_decompose(h[key], param=param, techno=techno)
 
         counts[key]           = d['counts']
@@ -920,7 +927,7 @@ def analyze_1D_fit(hist, param: dict, techno: dict, fitfunc,
     
     cprint(__name__ + f'.analyze_1D_fit:', 'magenta')
     
-    h = TH1_to_numpy(hist)
+    h = TH1_to_numpy(hist, rebin=techno.get('rebin', 1))
     d = hist_decompose(h, param=param, techno=techno)
 
     counts           = d['counts']
