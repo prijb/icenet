@@ -9,6 +9,8 @@ then
     echo '** ICENET environment already set. Run with: ICENET_ENV=; source setenv.sh to reset **'
 
 else
+    export MPLBACKEND=Agg
+    export PYTHONPATH="$(pwd):${PYTHONPATH}"
     export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
 
     echo $LD_LIBRARY_PATH
